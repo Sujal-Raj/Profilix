@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, FileText, Sparkles } from "lucide-react";
+import { Upload, FileText, Sparkles, Trash2 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
-
 
 interface ParsedData {
   name: string;
@@ -18,11 +17,9 @@ interface ParsedData {
     twitter: string | null;
     portfolio: string | null;
   };
-  // currentUser:string|null;
 }
 
 export default function CreatePortfolioPage() {
-
   const {user} = useUser();
   const currentUser = user?.primaryEmailAddress?.emailAddress;
   console.log(currentUser)
@@ -46,7 +43,6 @@ export default function CreatePortfolioPage() {
       twitter: null,
       portfolio: null,
     },
-    // currentUser:null,
   });
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -81,77 +77,43 @@ export default function CreatePortfolioPage() {
     }
   };
 
-  // const handleParseResume = async () => {
-  //   if (!file) return;
-
-  //   setIsLoading(true);
-  //   setError(null);
-
-  //   try {
-  //     const formDataToSend = new FormData();
-  //     formDataToSend.append("resume", file);
-  //     if(currentUser) {formDataToSend.append("currentUser", currentUser)};
-
-  //     const response = await fetch("/api/v1/ai/parse", {
-  //       method: "POST",
-  //       body: formDataToSend,
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to parse resume");
-  //     }
-
-  //     const data = await response.json();
-  //     console.log(data);
-  //     setFormData(data.portfolio);
-  //     console.log(formData)
-  //     setShowForm(true);
-  //   } catch (err) {
-  //     setError(err instanceof Error ? err.message : "An error occurred");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   const handleParseResume = async () => {
-  if (!file) return;
+    if (!file) return;
 
-  setIsLoading(true);
-  setError(null);
+    setIsLoading(true);
+    setError(null);
 
-  try {
-    const formDataToSend = new FormData();
-    formDataToSend.append("resume", file);
-    if (currentUser) {
-      formDataToSend.append("currentUser", currentUser);
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("resume", file);
+      if (currentUser) {
+        formDataToSend.append("currentUser", currentUser);
+      }
+
+      const response = await fetch("/api/v1/ai/parse", {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to parse resume");
+      }
+
+      const data = await response.json();
+      console.log("API response:", data);
+
+      if (data.portfolio) {
+        setFormData({ ...data.portfolio });
+        setShowForm(true);
+      } else {
+        setError("No portfolio data found in the response");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
     }
-
-    const response = await fetch("/api/v1/ai/parse", {
-      method: "POST",
-      body: formDataToSend,
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to parse resume");
-    }
-
-    const data = await response.json();
-    console.log("API response:", data);
-
-    if (data.portfolio) {
-      // Spread the portfolio object to ensure new reference for React state update
-      setFormData({ ...data.portfolio });
-      setShowForm(true);
-    } else {
-      setError("No portfolio data found in the response");
-    }
-  } catch (err) {
-    setError(err instanceof Error ? err.message : "An error occurred");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const handleManualEntry = () => {
     setSelectedOption("manual");
@@ -223,7 +185,6 @@ export default function CreatePortfolioPage() {
         twitter: null,
         portfolio: null,
       },
-      // currentUser:null,
     });
   };
 
@@ -286,9 +247,10 @@ export default function CreatePortfolioPage() {
                     />
                     <button
                       onClick={() => handleRemoveArrayItem("skills", index)}
-                      className="px-4 py-3 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900 transition font-medium"
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
+                      aria-label="Delete skill"
                     >
-                      Remove
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 ))}
@@ -316,9 +278,10 @@ export default function CreatePortfolioPage() {
                     />
                     <button
                       onClick={() => handleRemoveArrayItem("experience", index)}
-                      className="px-4 py-3 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900 transition font-medium"
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
+                      aria-label="Delete experience"
                     >
-                      Remove
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 ))}
@@ -346,9 +309,10 @@ export default function CreatePortfolioPage() {
                     />
                     <button
                       onClick={() => handleRemoveArrayItem("education", index)}
-                      className="px-4 py-3 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900 transition font-medium"
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
+                      aria-label="Delete education"
                     >
-                      Remove
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 ))}
@@ -376,9 +340,10 @@ export default function CreatePortfolioPage() {
                     />
                     <button
                       onClick={() => handleRemoveArrayItem("projects", index)}
-                      className="px-4 py-3 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900 transition font-medium"
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
+                      aria-label="Delete project"
                     >
-                      Remove
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 ))}
@@ -526,10 +491,10 @@ export default function CreatePortfolioPage() {
           </div>
 
           <div className="flex items-center gap-4 w-full">
-  <div className="flex-1 h-px bg-gray-700"></div>
-  <span className="text-gray-400 text-sm font-medium">Or</span>
-  <div className="flex-1 h-px bg-gray-700"></div>
-</div>
+            <div className="flex-1 h-px bg-gray-700"></div>
+            <span className="text-gray-400 text-sm font-medium">Or</span>
+            <div className="flex-1 h-px bg-gray-700"></div>
+          </div>
 
           {/* Manual Entry Form */}
           <div className="border-2 border-gray-200 dark:border-gray-800 rounded-3xl p-8 lg:p-10">
