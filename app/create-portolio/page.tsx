@@ -6,23 +6,40 @@ import { useUser } from "@clerk/clerk-react";
 
 interface ParsedData {
   name: string;
+  title: string;
+  email: string;
   about: string;
+  status: string;
   skills: string[];
-  experience: string[];
-  education: string[];
-  projects: string[];
+  experience: {
+    role: string;
+    company: string;
+    duration: string;
+    description: string;
+  }[];
+  education: {
+    degree: string;
+    school: string;
+    year: string;
+  }[];
+  projects: {
+    title: string;
+    description: string;
+    tech: string[];
+    link?: string | null;
+  }[];
   socialLinks: {
-    github: string | null;
-    linkedin: string | null;
-    twitter: string | null;
-    portfolio: string | null;
+    github?: string | null;
+    linkedin?: string | null;
+    twitter?: string | null;
   };
 }
 
 export default function CreatePortfolioPage() {
-  const {user} = useUser();
+  const { user } = useUser();
   const currentUser = user?.primaryEmailAddress?.emailAddress;
-  console.log(currentUser)
+  console.log(currentUser);
+
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +49,10 @@ export default function CreatePortfolioPage() {
 
   const [formData, setFormData] = useState<ParsedData>({
     name: "",
+    title: "",
+    email: "",
     about: "",
+    status: "Open to opportunities",
     skills: [],
     experience: [],
     education: [],
@@ -41,9 +61,10 @@ export default function CreatePortfolioPage() {
       github: null,
       linkedin: null,
       twitter: null,
-      portfolio: null,
     },
   });
+
+  // ================== Drag & Drop ==================
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -57,7 +78,7 @@ export default function CreatePortfolioPage() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile && droppedFile.type === "application/pdf") {
       setFile(droppedFile);
@@ -76,6 +97,8 @@ export default function CreatePortfolioPage() {
       setError("Please upload a PDF file");
     }
   };
+
+  // ================== AI Parse Resume ==================
 
   const handleParseResume = async () => {
     if (!file) return;
@@ -103,8 +126,10 @@ export default function CreatePortfolioPage() {
       console.log("API response:", data);
 
       if (data.portfolio) {
+        // data.portfolio must match ParsedData shape
         setFormData({ ...data.portfolio });
         setShowForm(true);
+        setSelectedOption("upload");
       } else {
         setError("No portfolio data found in the response");
       }
@@ -120,6 +145,8 @@ export default function CreatePortfolioPage() {
     setShowForm(true);
   };
 
+  // ================== Generic Field Handlers ==================
+
   const handleInputChange = (field: keyof ParsedData, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -127,32 +154,142 @@ export default function CreatePortfolioPage() {
     }));
   };
 
-  const handleArrayChange = (field: keyof ParsedData, index: number, value: string) => {
-    const array = [...(formData[field] as string[])];
-    array[index] = value;
+  // ---- Skills ----
+  const handleSkillChange = (index: number, value: string) => {
+    setFormData((prev) => {
+      const skills = [...prev.skills];
+      skills[index] = value;
+      return { ...prev, skills };
+    });
+  };
+
+  const handleAddSkill = () => {
     setFormData((prev) => ({
       ...prev,
-      [field]: array,
+      skills: [...prev.skills, ""],
     }));
   };
 
-  const handleAddArrayItem = (field: keyof ParsedData) => {
+  const handleRemoveSkill = (index: number) => {
+    setFormData((prev) => {
+      const skills = [...prev.skills];
+      skills.splice(index, 1);
+      return { ...prev, skills };
+    });
+  };
+
+  // ---- Experience ----
+  const handleAddExperience = () => {
     setFormData((prev) => ({
       ...prev,
-      [field]: [...(prev[field] as string[]), ""],
+      experience: [
+        ...prev.experience,
+        { role: "", company: "", duration: "", description: "" },
+      ],
     }));
   };
 
-  const handleRemoveArrayItem = (field: keyof ParsedData, index: number) => {
-    const array = [...(formData[field] as string[])];
-    array.splice(index, 1);
+  const handleExperienceChange = (
+    index: number,
+    field: keyof ParsedData["experience"][number],
+    value: string
+  ) => {
+    setFormData((prev) => {
+      const experience = [...prev.experience];
+      experience[index] = { ...experience[index], [field]: value };
+      return { ...prev, experience };
+    });
+  };
+
+  const handleRemoveExperience = (index: number) => {
+    setFormData((prev) => {
+      const experience = [...prev.experience];
+      experience.splice(index, 1);
+      return { ...prev, experience };
+    });
+  };
+
+  // ---- Education ----
+  const handleAddEducation = () => {
     setFormData((prev) => ({
       ...prev,
-      [field]: array,
+      education: [
+        ...prev.education,
+        { degree: "", school: "", year: "" },
+      ],
     }));
   };
 
-  const handleSocialLinkChange = (platform: keyof ParsedData["socialLinks"], value: string) => {
+  const handleEducationChange = (
+    index: number,
+    field: keyof ParsedData["education"][number],
+    value: string
+  ) => {
+    setFormData((prev) => {
+      const education = [...prev.education];
+      education[index] = { ...education[index], [field]: value };
+      return { ...prev, education };
+    });
+  };
+
+  const handleRemoveEducation = (index: number) => {
+    setFormData((prev) => {
+      const education = [...prev.education];
+      education.splice(index, 1);
+      return { ...prev, education };
+    });
+  };
+
+  // ---- Projects ----
+  const handleAddProject = () => {
+    setFormData((prev) => ({
+      ...prev,
+      projects: [
+        ...prev.projects,
+        { title: "", description: "", tech: [], link: "" },
+      ],
+    }));
+  };
+
+  const handleProjectChange = (
+    index: number,
+    field: keyof ParsedData["projects"][number],
+    value: string
+  ) => {
+    setFormData((prev) => {
+      const projects = [...prev.projects];
+      projects[index] = { ...projects[index], [field]: value };
+      return { ...prev, projects };
+    });
+  };
+
+  // tech as comma-separated string in UI → string[] in state
+  const handleProjectTechChange = (index: number, value: string) => {
+    const techArray = value
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    setFormData((prev) => {
+      const projects = [...prev.projects];
+      projects[index] = { ...projects[index], tech: techArray };
+      return { ...prev, projects };
+    });
+  };
+
+  const handleRemoveProject = (index: number) => {
+    setFormData((prev) => {
+      const projects = [...prev.projects];
+      projects.splice(index, 1);
+      return { ...prev, projects };
+    });
+  };
+
+  // ---- Social Links ----
+  const handleSocialLinkChange = (
+    platform: keyof ParsedData["socialLinks"],
+    value: string
+  ) => {
     setFormData((prev) => ({
       ...prev,
       socialLinks: {
@@ -162,8 +299,12 @@ export default function CreatePortfolioPage() {
     }));
   };
 
+  // ================== Submit / Reset ==================
+
   const handleCreatePortfolio = async () => {
     console.log("Creating portfolio with data:", formData);
+    // Here you’d POST to your /api/portfolio endpoint with:
+    // { ...formData, userEmail: currentUser, slug: ... }
     alert("Portfolio creation logic to be implemented!");
   };
 
@@ -174,7 +315,10 @@ export default function CreatePortfolioPage() {
     setError(null);
     setFormData({
       name: "",
+      title: "",
+      email: "",
       about: "",
+      status: "Open to opportunities",
       skills: [],
       experience: [],
       education: [],
@@ -183,10 +327,11 @@ export default function CreatePortfolioPage() {
         github: null,
         linkedin: null,
         twitter: null,
-        portfolio: null,
       },
     });
   };
+
+  // ================== FULL FORM VIEW ==================
 
   if (showForm) {
     return (
@@ -203,18 +348,64 @@ export default function CreatePortfolioPage() {
 
           <div className="space-y-6">
             <div className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8">
-              {/* Name */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-black dark:text-white mb-2">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  placeholder="John Doe"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
-                />
+              {/* Basic Info */}
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                {/* Name */}
+                <div>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
+                  />
+                </div>
+
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-2">
+                    Professional Title
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => handleInputChange("title", e.target.value)}
+                    placeholder="Full Stack Developer"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
+                  />
+                </div>
+              </div>
+
+              {/* Email & Status */}
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-2">
+                    Status
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.status}
+                    onChange={(e) => handleInputChange("status", e.target.value)}
+                    placeholder="Open to opportunities"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
+                  />
+                </div>
               </div>
 
               {/* About */}
@@ -241,12 +432,12 @@ export default function CreatePortfolioPage() {
                     <input
                       type="text"
                       value={skill}
-                      onChange={(e) => handleArrayChange("skills", index, e.target.value)}
+                      onChange={(e) => handleSkillChange(index, e.target.value)}
                       placeholder="e.g., React, Node.js"
                       className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
                     />
                     <button
-                      onClick={() => handleRemoveArrayItem("skills", index)}
+                      onClick={() => handleRemoveSkill(index)}
                       className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
                       aria-label="Delete skill"
                     >
@@ -255,7 +446,7 @@ export default function CreatePortfolioPage() {
                   </div>
                 ))}
                 <button
-                  onClick={() => handleAddArrayItem("skills")}
+                  onClick={handleAddSkill}
                   className="mt-2 px-4 py-2 bg-gray-100 dark:bg-gray-900 text-black dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 transition font-medium text-sm"
                 >
                   + Add Skill
@@ -268,25 +459,61 @@ export default function CreatePortfolioPage() {
                   Experience
                 </label>
                 {formData.experience.map((exp, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <textarea
-                      value={exp}
-                      onChange={(e) => handleArrayChange("experience", index, e.target.value)}
-                      rows={3}
-                      placeholder="Company | Position | Duration | Description"
-                      className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition resize-none"
+                  <div
+                    key={index}
+                    className="mb-4 border border-gray-200 dark:border-gray-800 rounded-xl p-4 space-y-3"
+                  >
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={exp.role}
+                        onChange={(e) =>
+                          handleExperienceChange(index, "role", e.target.value)
+                        }
+                        placeholder="Role (e.g., Senior Software Engineer)"
+                        className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
+                      />
+                      <input
+                        type="text"
+                        value={exp.company}
+                        onChange={(e) =>
+                          handleExperienceChange(index, "company", e.target.value)
+                        }
+                        placeholder="Company"
+                        className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={exp.duration}
+                      onChange={(e) =>
+                        handleExperienceChange(index, "duration", e.target.value)
+                      }
+                      placeholder="Duration (e.g., 2022 - Present)"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
                     />
-                    <button
-                      onClick={() => handleRemoveArrayItem("experience", index)}
-                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
-                      aria-label="Delete experience"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <textarea
+                      value={exp.description}
+                      onChange={(e) =>
+                        handleExperienceChange(index, "description", e.target.value)
+                      }
+                      placeholder="Description of your responsibilities and achievements"
+                      rows={3}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm resize-none"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => handleRemoveExperience(index)}
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
+                        aria-label="Delete experience"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 ))}
                 <button
-                  onClick={() => handleAddArrayItem("experience")}
+                  onClick={handleAddExperience}
                   className="mt-2 px-4 py-2 bg-gray-100 dark:bg-gray-900 text-black dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 transition font-medium text-sm"
                 >
                   + Add Experience
@@ -299,25 +526,52 @@ export default function CreatePortfolioPage() {
                   Education
                 </label>
                 {formData.education.map((edu, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
+                  <div
+                    key={index}
+                    className="mb-4 border border-gray-200 dark:border-gray-800 rounded-xl p-4 space-y-3"
+                  >
                     <input
                       type="text"
-                      value={edu}
-                      onChange={(e) => handleArrayChange("education", index, e.target.value)}
-                      placeholder="Degree | University | Year"
-                      className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
+                      value={edu.degree}
+                      onChange={(e) =>
+                        handleEducationChange(index, "degree", e.target.value)
+                      }
+                      placeholder="Degree (e.g., B.S. Computer Science)"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
                     />
-                    <button
-                      onClick={() => handleRemoveArrayItem("education", index)}
-                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
-                      aria-label="Delete education"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={edu.school}
+                        onChange={(e) =>
+                          handleEducationChange(index, "school", e.target.value)
+                        }
+                        placeholder="School / University"
+                        className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
+                      />
+                      <input
+                        type="text"
+                        value={edu.year}
+                        onChange={(e) =>
+                          handleEducationChange(index, "year", e.target.value)
+                        }
+                        placeholder="Year (e.g., 2020)"
+                        className="w-32 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => handleRemoveEducation(index)}
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
+                        aria-label="Delete education"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 ))}
                 <button
-                  onClick={() => handleAddArrayItem("education")}
+                  onClick={handleAddEducation}
                   className="mt-2 px-4 py-2 bg-gray-100 dark:bg-gray-900 text-black dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 transition font-medium text-sm"
                 >
                   + Add Education
@@ -330,25 +584,59 @@ export default function CreatePortfolioPage() {
                   Projects
                 </label>
                 {formData.projects.map((project, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <textarea
-                      value={project}
-                      onChange={(e) => handleArrayChange("projects", index, e.target.value)}
-                      rows={3}
-                      placeholder="Project Name | Description | Technologies | Link"
-                      className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition resize-none"
+                  <div
+                    key={index}
+                    className="mb-4 border border-gray-200 dark:border-gray-800 rounded-xl p-4 space-y-3"
+                  >
+                    <input
+                      type="text"
+                      value={project.title}
+                      onChange={(e) =>
+                        handleProjectChange(index, "title", e.target.value)
+                      }
+                      placeholder="Project title"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
                     />
-                    <button
-                      onClick={() => handleRemoveArrayItem("projects", index)}
-                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
-                      aria-label="Delete project"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <textarea
+                      value={project.description}
+                      onChange={(e) =>
+                        handleProjectChange(index, "description", e.target.value)
+                      }
+                      placeholder="Project description"
+                      rows={3}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm resize-none"
+                    />
+                    <input
+                      type="text"
+                      value={project.tech.join(", ")}
+                      onChange={(e) =>
+                        handleProjectTechChange(index, e.target.value)
+                      }
+                      placeholder="Technologies (comma separated e.g., React, Node.js)"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
+                    />
+                    <input
+                      type="url"
+                      value={project.link || ""}
+                      onChange={(e) =>
+                        handleProjectChange(index, "link", e.target.value)
+                      }
+                      placeholder="Project link (optional)"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-sm"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => handleRemoveProject(index)}
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-all duration-200 hover:scale-110"
+                        aria-label="Delete project"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 ))}
                 <button
-                  onClick={() => handleAddArrayItem("projects")}
+                  onClick={handleAddProject}
                   className="mt-2 px-4 py-2 bg-gray-100 dark:bg-gray-900 text-black dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 transition font-medium text-sm"
                 >
                   + Add Project
@@ -382,13 +670,6 @@ export default function CreatePortfolioPage() {
                     onChange={(e) => handleSocialLinkChange("twitter", e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
                   />
-                  <input
-                    type="url"
-                    placeholder="Portfolio URL"
-                    value={formData.socialLinks.portfolio || ""}
-                    onChange={(e) => handleSocialLinkChange("portfolio", e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
-                  />
                 </div>
               </div>
             </div>
@@ -413,6 +694,8 @@ export default function CreatePortfolioPage() {
       </div>
     );
   }
+
+  // ================== FIRST SCREEN (UPLOAD / MANUAL) ==================
 
   return (
     <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -468,7 +751,9 @@ export default function CreatePortfolioPage() {
 
             {error && (
               <div className="mt-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl p-3">
-                <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
+                <p className="text-sm text-red-600 dark:text-red-400 text-center">
+                  {error}
+                </p>
               </div>
             )}
 
@@ -496,7 +781,7 @@ export default function CreatePortfolioPage() {
             <div className="flex-1 h-px bg-gray-700"></div>
           </div>
 
-          {/* Manual Entry Form */}
+          {/* Manual Entry Form (preview) */}
           <div className="border-2 border-gray-200 dark:border-gray-800 rounded-3xl p-8 lg:p-10">
             <div className="flex items-center justify-center w-16 h-16 bg-black dark:bg-white rounded-2xl mb-6 mx-auto">
               <FileText className="w-8 h-8 text-white dark:text-black" />
@@ -523,6 +808,34 @@ export default function CreatePortfolioPage() {
                 />
               </div>
 
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-semibold text-black dark:text-white mb-2">
+                  Professional Title
+                </label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  placeholder="Full Stack Developer"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition text-sm"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-semibold text-black dark:text-white mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition text-sm"
+                />
+              </div>
+
               {/* About */}
               <div>
                 <label className="block text-sm font-semibold text-black dark:text-white mb-2">
@@ -537,7 +850,7 @@ export default function CreatePortfolioPage() {
                 />
               </div>
 
-              {/* Skills */}
+              {/* Skills (preview, first 2) */}
               <div>
                 <label className="block text-sm font-semibold text-black dark:text-white mb-2">
                   Skills
@@ -547,14 +860,14 @@ export default function CreatePortfolioPage() {
                     key={index}
                     type="text"
                     value={skill}
-                    onChange={(e) => handleArrayChange("skills", index, e.target.value)}
+                    onChange={(e) => handleSkillChange(index, e.target.value)}
                     placeholder="e.g., React"
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition mb-2 text-sm"
                   />
                 ))}
                 {formData.skills.length < 2 && (
                   <button
-                    onClick={() => handleAddArrayItem("skills")}
+                    onClick={handleAddSkill}
                     className="text-sm text-black dark:text-white hover:underline"
                   >
                     + Add skill
@@ -585,7 +898,7 @@ export default function CreatePortfolioPage() {
             </div>
 
             <button
-              onClick={() => setShowForm(true)}
+              onClick={handleManualEntry}
               className="w-full mt-6 bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition"
             >
               Continue to Full Form
