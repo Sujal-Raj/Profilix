@@ -29,7 +29,8 @@ export default function HowItWorksPage() {
     <>
       <section className="py-20 bg-white dark:bg-black relative overflow-hidden">
         {/* Subtle background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-transparent dark:from-gray-900/30 dark:to-transparent pointer-events-none" />
+        {/* <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-transparent dark:from-gray-900/30 dark:to-transparent pointer-events-none" /> */}
+        <div className="absolute inset-0 bg-white dark:bg-black pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-20">
@@ -64,7 +65,7 @@ export default function HowItWorksPage() {
                     style={{ animationDelay: step.delay }}
                   >
                     {/* Card with hover effect */}
-                    <div className="relative bg-white dark:bg-black border border-gray-100 dark:border-gray-900 rounded-2xl p-8 transition-all duration-300 hover:border-gray-200 dark:hover:border-gray-800 hover:shadow-xl hover:-translate-y-1">
+                    <div className="relative bg-white dark:bg-black border border-gray-100 dark:border-gray-900 rounded-2xl p-8 transition-all duration-300 hover:border-gray-200 dark:hover:border-gray-800 hover:shadow-xl hover:-translate-y-1 shadow shadow-gray-800 ">
                       {/* Step number badge */}
                       <div className="relative mb-6">
                         <div className="w-16 h-16 bg-black dark:bg-white rounded-2xl flex items-center justify-center mx-auto transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-lg">

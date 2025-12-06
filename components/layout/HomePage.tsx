@@ -18,15 +18,25 @@ export default function HomePage(){
         </AnimatedShinyText>
           </div>  
           
-          <h1 className="text-4xl sm:text-5xl md:text-8xl lg:text-7xl font-bold text-black dark:text-white mb-6 leading-tighter">
+          {/* <h1 className="text-4xl sm:text-5xl md:text-8xl lg:text-7xl font-bold text-black dark:text-white mb-6 leading-tighter">
             Create Stunning Portfolio in Minutes
+          </h1> */}
+          <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-6xl font-bold text-black dark:text-white mb-6 leading-tighter">
+            Transform Your Resume into a Stunning Portfolio
           </h1>
           
-          <p className="text-md md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto">
+          {/* <p className="text-md md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto">
             No design skills required. Just upload your work, customize your layout,
           </p>
           <p className="text-md md:text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-3xl mx-auto">
             and share your unique portfolio URL with potential clients.
+          </p> */}
+
+            <p className="text-md md:text-lg text-gray-600 dark:text-gray-400 leading-tight max-w-3xl mx-auto mb-1">
+            Simply upload your resume and watch AI instantly create a professional,
+          </p>
+          <p className="text-md md:text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-3xl mx-auto">
+            customizable portfolio website. No coding or design skills needed.
           </p>
           <p className="text-base text-gray-500 dark:text-gray-500 ">
             Perfect for 
@@ -57,3 +67,6 @@ export default function HomePage(){
 
     )
 }
+
+
+
