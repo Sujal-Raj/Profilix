@@ -337,10 +337,10 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
           
           <div className="relative z-10">
             <h2 className="text-4xl sm:text-5xl font-bold mb-4 text-white dark:text-black">
-              Let's Build Something Amazing
+              Let&apos;s Build Something Amazing
             </h2>
             <p className="text-lg text-gray-300 dark:text-gray-700 mb-10 max-w-2xl mx-auto">
-              I'm always excited to work on new projects and collaborate with talented people.
+              I&apos;m always excited to work on new projects and collaborate with talented people.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

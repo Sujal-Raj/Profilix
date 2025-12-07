@@ -825,7 +825,7 @@ export default function CreatePortfolioPage() {
             Create Your Portfolio
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Choose how you'd like to get started
+            Choose how you&apos;d like to get started
           </p>
         </div>
 
@@ -905,7 +905,7 @@ export default function CreatePortfolioPage() {
           onClick={()=>{
             setShowForm(true);
           }} className="w-[90%] mx-auto mt-0 bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed">
-            Don't have a resume. Start entering manually
+            Don&apos;t have a resume. Start entering manually
           </button>
 
           {/* Manual Entry Form (preview) */}

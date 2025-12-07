@@ -165,7 +165,7 @@ Notes for extraction:
       }
 
       const name = user.name || parsedJson.name || "portfolio";
-      let baseSlug = slugify(name, { lower: true });
+      const baseSlug = slugify(name, { lower: true });
       let slug = baseSlug;
 
       const existing = await PortfolioModel.findOne({ slug });

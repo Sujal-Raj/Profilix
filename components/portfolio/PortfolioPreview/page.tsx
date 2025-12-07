@@ -9,9 +9,10 @@ export default function PortfolioPreview({ portfolio, theme }: PortfolioPreviewP
   const isDark = theme === "dark";
 
   return (
-    <main className={`min-h-screen ${isDark ? "bg-black text-white" : "bg-white text-gray-900"} transition-colors duration-300`}>
+    <>
+    <main className={`min-h-screen ${isDark ? "bg-black text-white" : "bg-white text-gray-900"} transition-colors duration-300 border rounded-2xl p-2`}>
       {/* Header */}
-      <header className={`sticky top-0 z-50 ${isDark ? "bg-black/80" : "bg-white/80"} backdrop-blur-xl border-b ${isDark ? "border-gray-900" : "border-gray-100"}`}>
+      <header className={` top-0 z-50 ${isDark ? "bg-black/80" : "bg-white/80"} backdrop-blur-xl border-b ${isDark ? "border-gray-900" : "border-gray-100"}`}>
         <nav className="max-w-6xl mx-auto px-6 lg:px-8 py-5 flex justify-between items-center">
           <div className="font-bold text-lg tracking-tight">{portfolio.name}</div>
           <div className="flex items-center gap-3">
@@ -181,27 +182,74 @@ export default function PortfolioPreview({ portfolio, theme }: PortfolioPreviewP
         )}
 
         {/* Contact CTA */}
-        <section className="relative rounded-3xl bg-gradient-to-br from-gray-900 to-black dark:from-white dark:to-gray-100 p-12 sm:p-16 text-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-transparent to-pink-500/20"></div>
-          
-          <div className="relative z-10">
-            <h2 className={`text-4xl sm:text-5xl font-bold mb-4 ${isDark ? "text-white" : "text-white"}`}>
-              Let's Build Something Amazing
-            </h2>
-            <p className={`text-lg ${isDark ? "text-gray-400" : "text-gray-300"} mb-10 max-w-2xl mx-auto`}>
-              I'm always excited to work on new projects and collaborate with talented people.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a href={`mailto:${portfolio?.email}`} className={`inline-flex items-center gap-2 px-8 py-4 ${isDark ? "bg-black text-white shadow  shadow-white" : "bg-white text-black"} rounded-xl font-medium hover:scale-105 transition-all duration-300 hover:shadow-lg group`}>
-                <Mail className="w-5 h-5" />
-                <span>Send me an email</span>
-                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </a>
-            </div>
+        <section className="relative rounded-3xl bg-gradient-to-br from-sky-950 to-slate-900 dark:from-slate-50 dark:to-sky-100 p-12 sm:p-16 text-center overflow-hidden">
+  {/* subtle overlay gradient */}
+  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-indigo-500/20" />
+
+  {/* floating blobs */}
+  <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-0 left-1/4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+            <div className="absolute top-0 right-1/4 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+            <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
           </div>
-        </section>
+
+  <div className="relative z-10">
+    <h2
+      className={`text-4xl sm:text-5xl font-bold mb-4 ${
+        isDark ? "text-slate-900" : "text-slate-900"
+      }`}
+    >
+      Let&apos;s Build Something Amazing
+    </h2>
+
+    <p
+      className={`text-lg mb-10 max-w-2xl mx-auto ${
+        isDark ? "text-slate-600" : "text-slate-600"
+      }`}
+    >
+      I&apos;m always excited to work on new projects and collaborate with
+      talented people.
+    </p>
+
+    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      {/* email button */}
+      <a
+        href={`mailto:${portfolio?.email || portfolio?.userEmail}`}
+        className={`inline-flex items-center gap-2 px-8 py-4 rounded-xl font-medium hover:scale-105 transition-all duration-300 group
+          ${
+            isDark
+              ? "bg-white text-slate-900 shadow-lg shadow-cyan-500/30 hover:shadow-xl"
+              : "bg-slate-900 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl"
+          }`}
+      >
+        <Mail className="w-5 h-5" />
+        <span>Send me an email</span>
+        <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+      </a>
+
+      {/* LinkedIn button if present */}
+      {portfolio?.socialLinks?.linkedin && (
+        <a
+          href={portfolio.socialLinks.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`inline-flex items-center gap-2 px-8 py-4 rounded-xl font-medium border-2 transition-all duration-300
+            ${
+              isDark
+                ? "border-white/30 text-slate-900 hover:bg-white/10"
+                : "border-slate-300 text-slate-900 hover:bg-slate-100"
+            }`}
+        >
+          <Linkedin className="w-5 h-5" />
+          <span>Connect on LinkedIn</span>
+        </a>
+      )}
+    </div>
+  </div>
+</section>
+
       </div>
     </main>
+    </>
   );
 }

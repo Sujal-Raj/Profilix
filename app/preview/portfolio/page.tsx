@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Monitor, Smartphone, Sun, Moon, Save,MoveLeft } from "lucide-react";
+import { Monitor, Smartphone, Sun, Moon, Save,MoveLeft,Eye } from "lucide-react";
 import PortfolioPreview from "@/components/portfolio/PortfolioPreview/page";
 import EditForm from "@/components/portfolio/EditForm/page";
 // import PortfolioPreview from "@/components/portfolio/PortfolioPreview";
@@ -99,10 +99,10 @@ export default function PreviewPortfolioPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black">
       {/* Top Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
         <div className="px-6 py-4 flex items-center justify-between">
           <button
-            onClick={() => router.push("/create")}
+            onClick={() => router.push("/create/portfilio")}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
           >
             <MoveLeft/>
@@ -110,8 +110,9 @@ export default function PreviewPortfolioPage() {
           </button>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 rounded-lg p-1">
-            <button
+          {/* <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 rounded-lg p-1"> */}
+          <div className="flex items-center gap-2 rounded-lg p-1 pt-0">
+            {/* <button
               onClick={() => setViewMode("desktop")}
               className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 ${
                 viewMode === "desktop"
@@ -132,18 +133,23 @@ export default function PreviewPortfolioPage() {
             >
               <Smartphone size={16} />
               <span className="text-sm font-medium">Mobile</span>
-            </button>
-          </div>
+            </button> */}
+            {/* Preview badge - positioned above the card */}
+        <div className="inline-flex items-center gap-1.5 bg-black/95 backdrop-blur-sm text-white text-xs px-4 py-1.5 rounded-full shadow-xl border border-gray-800/50 ml-40">
+          <Eye size={14} />
+          <span>Preview mode</span>
+        </div>
+      </div>
 
           <div className="flex items-center gap-3">
             {/* Theme Toggle */}
             <button
               onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg transition-all duration-200 group"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg border-2 border-gray-700 transition-all duration-200 group cursor-pointer"
               title="Toggle theme"
             >
               {theme === "light" ? (
-                <Moon size={18} className="text-gray-600 group-hover:text-black transition-colors" />
+                <Moon size={18} className="text-gray-400 group-hover:text-white transition-colors" />
               ) : (
                 <Sun size={18} className="text-gray-400 group-hover:text-white transition-colors" />
               )}
@@ -163,7 +169,7 @@ export default function PreviewPortfolioPage() {
       </nav>
 
       {/* Main Content */}
-      <div className="pt-20 flex">
+      <div className="pt-18 flex">
 
         {/* Right Side - Edit Form */}
         <div className="h-[calc(100vh-80px)] bg-white dark:bg-black border-l border-gray-200 dark:border-gray-800">

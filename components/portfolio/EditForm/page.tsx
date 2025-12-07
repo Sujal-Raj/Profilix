@@ -465,9 +465,9 @@ export default function EditForm({ formData, setFormData }: EditFormProps) {
   };
 
   return (
-    <div className="flex h-full relative">
+    <div className="flex h-full relative border-r-2 border-gray-700">
       {/* Sidebar - Fixed width 80px */}
-      <div className="w-20 flex-shrink-0 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col items-center py-6 gap-2">
+      <div className="w-20 flex-shrink-0 bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 flex flex-col items-center py-6 gap-2">
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="p-3 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-xl transition-all duration-200 mb-2"
@@ -520,7 +520,7 @@ export default function EditForm({ formData, setFormData }: EditFormProps) {
 
       {/* Main Content - Fixed width 400px, smooth slide in/out */}
       <div 
-        className={`flex flex-col bg-white dark:bg-gray-950 transition-all duration-500 ease-in-out overflow-hidden ${
+        className={`flex flex-col bg-white dark:bg-black transition-all duration-500 ease-in-out overflow-hidden ${
           isCollapsed ? 'w-0 opacity-0' : 'w-[400px] opacity-100'
         }`}
       >
