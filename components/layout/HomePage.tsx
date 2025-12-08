@@ -21,8 +21,11 @@ export default function HomePage(){
           {/* <h1 className="text-4xl sm:text-5xl md:text-8xl lg:text-7xl font-bold text-black dark:text-white mb-6 leading-tighter">
             Create Stunning Portfolio in Minutes
           </h1> */}
-          <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-6xl font-bold text-black dark:text-white mb-6 leading-tighter">
+          {/* <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-6xl font-bold text-black dark:text-white mb-6 leading-tighter">
             Transform Your Resume into a Stunning Portfolio
+          </h1> */}
+          <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-6xl font-bold text-black dark:text-white mb-6 leading-tighter">
+            Turn Your <br /> Resume into a Portfolio
           </h1>
           
           {/* <p className="text-md md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl mx-auto">

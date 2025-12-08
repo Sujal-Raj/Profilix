@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Briefcase, GraduationCap, Code2, Mail, Github, Linkedin, ExternalLink, ArrowUpRight, Sparkles, Calendar, Award } from "lucide-react";
+import { useParams } from "next/navigation";
 
-export default function PortfolioPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default function PortfolioPage() {
+  // const { slug } = params;
+   const { slug } = useParams<{ slug: string }>();
 
   const [portfolio, setPortfolio] = useState<any>(null);
   const [loading, setLoading] = useState(true);
