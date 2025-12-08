@@ -1,80 +1,76 @@
 # Contributing to Portfolio Generator
 
-Thank you for your interest in contributing! We welcome pull requests, bug reports, and feature suggestions.
+Thanks for your interest in contributing! We welcome bug reports, improvements, and new features.
 
-## How to Contribute
+## Quickstart
 
-### 1. Fork the Repository
+1. Fork the repository on GitHub and clone your fork:
 
-Click "Fork" at the top right of the GitHub page and clone your fork:
-
-```bash
-git clone https://github.com/yourusername/portfolio-generator.git
-cd portfolio-generator
+```powershell
+git clone https://github.com/Sujal-Raj/portfilio-generator.git
+cd portfilio-generator
 ```
 
-### 2. Set Up Locally
+2. Install dependencies:
 
-Install dependencies:
-
-```bash
+```powershell
 npm install
 ```
 
-Create a `.env.local` file and add the required environment variables (see [README.md](README.md)).
+3. Create a `.env.local` with the required environment variables (see `README.md`).
 
-### 3. Make Changes
+## Branching & Commits
 
-- Create a new branch for your feature or fix:
-  ```bash
-  git checkout -b feature/your-feature-name
-  ```
-- Make your changes.
-- Write unit tests for new features or bug fixes.
+- Create a descriptive branch name: `feature/your-feature`, `fix/issue-123`, or `chore/deps`
+- Make small, focused commits with clear messages. Use the imperative tense, e.g. `Add resume parsing endpoint`.
 
-### 4. Run Tests
+Example:
 
-Run all tests before submitting:
-
-```bash
-npm test
-```
-
-### 5. Commit and Push
-
-Commit your changes with a clear message:
-
-```bash
+```powershell
+git checkout -b feature/add-gemini-parse
+# make changes
 git add .
-git commit -m "Describe your changes"
-git push origin feature/your-feature-name
+git commit -m "Add resume parsing using Google Gemini"
+git push origin feature/add-gemini-parse
 ```
 
-### 6. Open a Pull Request
+## Tests & Linting
 
-Go to your fork on GitHub and click "New Pull Request".  
-Describe your changes and reference any related issues.
+- Run tests (if available): `npm test`
+- Run linters and formatters before opening a PR: `npm run lint` and `npm run format`
 
-## Code Style
+## Pull Request Checklist
 
-- Use [Prettier](https://prettier.io/) for formatting.
-- Follow the existing code structure and naming conventions.
-- Write clear, concise comments where necessary.
+Before opening a PR, please ensure:
+
+- [ ] Your code builds and runs locally
+- [ ] Relevant tests were added or updated
+- [ ] Linting and formatting pass
+- [ ] The PR description explains the problem and the solution
+- [ ] References to related issues (if any)
+
+When opening a PR, include screenshots or short GIFs for UI changes and a short summary of behavior changes.
 
 ## Reporting Issues
 
-- Use [GitHub Issues](https://github.com/yourusername/portfolio-generator/issues) to report bugs or request features.
-- Include steps to reproduce, expected behavior, and screenshots if helpful.
+- Open an issue at: `https://github.com/Sujal-Raj/portfilio-generator/issues`
+- Provide a clear title, steps to reproduce, expected vs actual behavior, environment (Node, OS), and any logs or screenshots.
 
-## Community Guidelines
+## Code Style
 
-- Be respectful and constructive.
-- No spam, hate speech, or inappropriate content.
+- We use Prettier for formatting. Please format changes before committing.
+- Follow existing patterns in the codebase and prefer clarity over cleverness.
+
+## Community & Conduct
+
+Be respectful and constructive. By contributing, you agree to follow the project's Code of Conduct (we follow the Contributor Covenant):
+
+https://www.contributor-covenant.org/
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree your contributions will be licensed under the project's MIT License.
 
 ---
 
-Thank you for helping improve Portfolio Generator!
+Thanks — your contributions make this project better!

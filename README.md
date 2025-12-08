@@ -1,24 +1,24 @@
 # Portfolio Generator
 
-A Next.js application that lets users register, upload their resume (PDF), and generate a beautiful portfolio using Google Gemini AI. User data and portfolios are stored in MongoDB.
+A Next.js application that lets users register, upload a resume (PDF), parse it using Google Gemini AI, and generate a polished portfolio. User data and portfolios are persisted in MongoDB.
 
 ## Features
 
-- **User Registration:** Sign up with email, managed via Clerk and stored in MongoDB.
-- **Resume Parsing:** Upload a PDF resume and extract structured data (name, about, skills, experience, education, projects, social links) using Google Gemini AI.
-- **Portfolio Creation:** Review and edit parsed data, or fill manually, then save your portfolio.
-- **RESTful API:** All features are exposed via API endpoints.
-- **Modern UI:** Built with Next.js App Router, Tailwind CSS, and Clerk authentication.
+- User registration (Clerk) and session management
+- PDF resume parsing with Google Gemini AI
+- Edit and save generated portfolios
+- REST API endpoints for integrations and automation
+- Built with Next.js App Router, TypeScript, Tailwind CSS
 
 ## Tech Stack
 
-- [Next.js 13+ (App Router)](https://nextjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [MongoDB](https://www.mongodb.com/)
-- [Google Gemini AI](https://ai.google.dev/)
-- [pdf-parse](https://www.npmjs.com/package/pdf-parse)
-- [Clerk](https://clerk.com/) for authentication
-- [Zustand](https://zustand-demo.pmnd.rs/) for state management
+- Next.js 13+ (App Router)
+- TypeScript
+- MongoDB
+- Google Gemini AI
+- pdf-parse
+- Clerk (authentication)
+- Zustand (state management)
 
 ## Getting Started
 
@@ -26,96 +26,94 @@ A Next.js application that lets users register, upload their resume (PDF), and g
 
 - Node.js 18+
 - MongoDB instance (local or Atlas)
-- Google Gemini API Key
+- Google Gemini API key
 - Clerk API keys
 
 ### Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/portfolio-generator.git
-   cd portfolio-generator
-   ```
+1. Clone the repository:
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+```powershell
+git clone https://github.com/Sujal-Raj/portfilio-generator.git
+cd portfilio-generator
+```
 
-3. **Set up environment variables:**
+2. Install dependencies:
 
-   Create a `.env.local` file in the root directory:
+```powershell
+npm install
+```
 
-   ```
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-   CLERK_SECRET_KEY=your_clerk_secret_key
-   GEMINI_API_KEY=your_google_gemini_api_key
-   MONGODB_URI=your_mongodb_connection_string
-   ```
+3. Create a `.env.local` file in the project root and add the required variables (example):
 
-### Running the App
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+GEMINI_API_KEY=your_google_gemini_api_key
+MONGODB_URI=your_mongodb_connection_string
+```
 
-```bash
+### Available Scripts
+
+- `npm run dev` — start development server (localhost:3000)
+- `npm run build` — build for production
+- `npm start` — run production build
+- `npm run lint` — run linters
+- `npm run format` — run code formatter (Prettier)
+- `npm test` — run tests (if present)
+
+### Run locally
+
+```powershell
 npm run dev
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000).
+Open http://localhost:3000 in your browser.
 
-## API Endpoints
+## API Endpoints (high level)
 
-### 1. Register User
+- `POST /api/v1/auth/register` — register a user
+- `POST /api/v1/ai/parse` — upload resume (multipart/form-data) and parse
 
-**POST** `/api/v1/auth/register`
+See the `app/api` folder for full route implementations. A Postman collection is available at `postman_collection.json` for quick testing.
 
-- **Body:** JSON
-  ```json
-  {
-    "email": "user@example.com"
-  }
-  ```
-- **Response:** Registration status message
-
-### 2. Parse Resume
-
-**POST** `/api/v1/ai/parse`
-
-- **Body:** `multipart/form-data` with a `resume` field (PDF file) and `currentUser` (email)
-- **Response:** Extracted resume fields in JSON, portfolio saved to MongoDB
-
-**Example (using Postman):**
-- Method: `POST`
-- URL: `http://localhost:3000/api/v1/ai/parse`
-- Body: `form-data`, key: `resume` (type: File), value: your PDF; key: `currentUser`, value: your email
-
-## API Testing
-
-A ready-to-use Postman collection is provided in [postman_collection.json](postman_collection.json).  
-Import this file into Postman to quickly test the available endpoints.
-
-## Project Structure
+## Project Structure (truncated)
 
 ```
 app/
   api/
     v1/
-      ai/
-        parse/
-          route.ts      # Resume parsing endpoint
-      auth/
-        register/
-          route.ts      # User registration endpoint
-  /create/portfolio
-    page.tsx            # Portfolio creation UI
-  layout.tsx            # App layout
-  page.tsx              # Home page
+      ai/parse/route.ts
+      auth/register/route.ts
+  create/portfolio/page.tsx
+  layout.tsx
+  page.tsx
 components/
   layout/
-    Navbar.tsx          # Top navigation bar
-    HomePage.tsx        # Home page hero section
-    HowItWorks.tsx      # How it works section
-  AuthProvider.ts       # Clerk + Zustand integration
+  portfolio/
 lib/
-  db.ts                 # MongoDB connection helper
+models/
+store/
+public/
+```
+
+## Troubleshooting
+
+- 404 errors: ensure the dev server is running and the route exists
+- MongoDB errors: verify `MONGODB_URI` and that MongoDB is accessible
+- Gemini/Clerk errors: verify API keys and permissions
+
+## Contributing
+
+Contributions are welcome — see `Contributing.md` for guidelines.
+
+## License
+
+MIT
+
+---
+
+Made with ❤️ using Next.js, Clerk, and Google Gemini AI
 models/
   user.model.ts         # Mongoose user schema
   portfolio.model.ts    # Mongoose portfolio schema
