@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Monitor, Smartphone, Sun, Moon, Save,MoveLeft,Eye } from "lucide-react";
 import PortfolioPreview from "@/components/portfolio/PortfolioPreview/page";
 import EditForm from "@/components/portfolio/EditForm/page";
+import Link from "next/link";
 // import PortfolioPreview from "@/components/portfolio/PortfolioPreview";
 // import EditForm from "@/components/portfolio/EditForm";
 
@@ -51,12 +52,17 @@ export default function PreviewPortfolioPage() {
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [isSaving, setIsSaving] = useState(false);
-
+  const [slug, setSlug] = useState<string>("");
   useEffect(() => {
     // Get data from sessionStorage
     const storedData = sessionStorage.getItem("portfolioData");
+     const parsed = JSON.parse(storedData!);
+      setSlug(parsed.slug);
+      console.log(parsed.slug)
+    // console.log(storedData?.slug)
     if (storedData) {
       setFormData(JSON.parse(storedData));
+      // console.log(formData)
     } else {
       // If no data, redirect back
       router.push("/create");
@@ -156,14 +162,16 @@ export default function PreviewPortfolioPage() {
             </button>
 
             {/* Save Button */}
+            <Link href={`/${slug}`}>
             <button
-              onClick={handleSave}
+              // onClick={handleSave}
               disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 disabled:opacity-50"
-            >
+              className="flex items-center gap-2 px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 cursor-pointer"
+              >
               <Save size={16} />
               {isSaving ? "Publishing..." : "Publish Portfolio"}
             </button>
+              </Link>
           </div>
         </div>
       </nav>
