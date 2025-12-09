@@ -41,8 +41,8 @@ interface ParsedData {
 export default function CreatePortfolioPage() {
   const { user } = useUser();
   // console.log(user)
-  // const currentUser = user?.primaryEmailAddress?.emailAddress;
-  const currentUser = "bhumi.sahayata10@gmail.com";
+  const currentUser = user?.primaryEmailAddress?.emailAddress;
+  // const currentUser = "bhumi.sahayata10@gmail.com";
   console.log(currentUser);
 
   const [file, setFile] = useState<File | null>(null);
@@ -182,45 +182,46 @@ export default function CreatePortfolioPage() {
 
   // ================== AI Parse Resume ==================
 
-  // const handleParseResume = async () => {
-  //   if (!file) return;
+  const handleParseResume = async () => {
+    if (!file) return;
 
-  //   setIsLoading(true);
-  //   setError(null);
+    setIsLoading(true);
+    setError(null);
 
-  //   try {
-  //     const formDataToSend = new FormData();
-  //     formDataToSend.append("resume", file);
-  //     if (currentUser) {
-  //       formDataToSend.append("currentUser", currentUser);
-  //     }
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("resume", file);
+      if (currentUser) {
+        formDataToSend.append("currentUser", currentUser);
+      }
 
-  //     const response = await fetch("/api/v1/ai/parse", {
-  //       method: "POST",
-  //       body: formDataToSend,
-  //     });
+      const response = await fetch("/api/v1/ai/parse", {
+        method: "POST",
+        body: formDataToSend,
+      });
 
-  //     if (!response.ok) {
-  //       throw new Error("Failed to parse resume");
-  //     }
+      if (!response.ok) {
+        throw new Error("Failed to parse resume");
+      }
 
-  //     const data = await response.json();
-  //     console.log("API response:", data);
+      const data = await response.json();
+      console.log("API response:", data);
 
-  //     if (data.portfolio) {
-  //       // data.portfolio must match ParsedData shape
-  //       setFormData({ ...data.portfolio });
-  //       setShowForm(true);
-  //       setSelectedOption("upload");
-  //     } else {
-  //       setError("No portfolio data found in the response");
-  //     }
-  //   } catch (err) {
-  //     setError(err instanceof Error ? err.message : "An error occurred");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+      if (data.portfolio) {
+        // data.portfolio must match ParsedData shape
+        router.push("/preview/portfolio")
+        // setFormData({ ...data.portfolio });
+        // setShowForm(true);
+        // setSelectedOption("upload");
+      } else {
+        setError("No portfolio data found in the response");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleManualEntry = () => {
     setSelectedOption("manual");
@@ -879,7 +880,7 @@ export default function CreatePortfolioPage() {
 
             {file && (
               <button
-                // onClick={handleParseResume}
+                onClick={handleParseResume}
                 disabled={isLoading}
                 className="w-full mt-6 bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
