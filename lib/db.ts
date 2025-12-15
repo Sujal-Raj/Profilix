@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 export async function dbConnect() {
     try {
-        await mongoose.connect("mongodb://localhost:27017/portfilioGenerator");
+        await mongoose.connect(process.env.MONGO_URI!);
     console.log("Connected")
     } catch (error) {
         console.log(error)
