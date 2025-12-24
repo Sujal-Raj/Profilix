@@ -1,6 +1,6 @@
 import PortfolioModel from "@/models/portfolio.model";
 import { NextRequest, NextResponse } from "next/server";
-import {dbConnect} from "@/lib/db"; // if you use one
+import {dbConnect} from "@/lib/db"; 
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,30 +16,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if portfolio already exists
-    const existingPortfolio = await PortfolioModel.findOne({ slug });
-
-    if (existingPortfolio) {
-      return NextResponse.json(
-        {
-          message: "Portfolio found",
-          slug: existingPortfolio.slug,
-          portfolio: existingPortfolio,
-        },
-        { status: 200 }
-      );
-    }
-
-    // Create new portfolio
-    const newPortfolio = await PortfolioModel.create(body);
+    const updatedPortfolio = await PortfolioModel.findOneAndUpdate(
+      { slug },
+      body,
+      {
+        new: true,
+        upsert: true,    
+        runValidators: true,
+      }
+    );
 
     return NextResponse.json(
       {
-        message: "Portfolio created",
-        slug: newPortfolio.slug,
-        portfolio: newPortfolio,
+        message: "Portfolio saved",
+        slug: updatedPortfolio.slug,
+        portfolio: updatedPortfolio,
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
     console.error(error);
@@ -49,3 +42,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
