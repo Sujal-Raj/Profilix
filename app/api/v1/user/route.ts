@@ -1,9 +1,14 @@
+import { dbConnect } from "@/lib/db";
 import PortfolioModel from "@/models/portfolio.model";
 import UserModel from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 
+
 export async function POST(req: NextRequest) {
   try {
+
+    await dbConnect();
+    
     const { email } = await req.json();
 
     if (!email) {

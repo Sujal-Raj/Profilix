@@ -216,7 +216,7 @@ export default function PortfolioPreview({
                 <div
                   key={i}
                   className={`group relative p-5 sm:p-6 lg:p-8 rounded-xl ${
-                    isDark ? "bg-gray-950 border-gray-800 hover:border-gray-700" : "bg-white border-gray-200 hover:border-gray-300"
+                    isDark ? "bg-black border-gray-800 hover:border-gray-700" : "bg-white border-gray-200 hover:border-gray-300"
                   } border transition-all duration-500 hover:shadow-xl ${
                     isDark ? "hover:shadow-gray-900/50" : "hover:shadow-gray-100"
                   } animate-fade-in-up`}
@@ -224,19 +224,19 @@ export default function PortfolioPreview({
                 >
                   <div className="flex flex-col sm:flex-row sm:justify-between mb-3 sm:mb-4 gap-2">
                     <div>
-                      <h3 className="text-lg sm:text-xl font-semibold group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                      <h3 className="text-lg sm:text-xl dark:group-hover:text-gray-300 transition-colors">
                         {exp.role}
                       </h3>
                       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium">
                         {exp.company}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 shrink-0">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-white shrink-0">
                       <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                       {exp.duration}
                     </div>
                   </div>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-500 dark:text-gray-500 leading-relaxed">
                     {exp.description}
                   </p>
                   
@@ -258,34 +258,32 @@ export default function PortfolioPreview({
               </div>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Featured Projects</h2>
             </div>
-            <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-1">
               {portfolio.projects.map((proj: Project, i: number) => (
                 <div
                   key={i}
                   onClick={() => proj.link && window.open(proj.link, "_blank")}
                   className={`group relative p-5 sm:p-6 lg:p-8 rounded-xl ${
-                    isDark ? "bg-gray-950 border-gray-800 hover:border-gray-700" : "bg-white border-gray-200 hover:border-gray-300"
+                    isDark ? "bg-black border-gray-800 hover:border-gray-700" : "bg-white border-gray-200 hover:border-gray-300"
                   } border cursor-pointer transition-all duration-500 hover:shadow-xl ${
                     isDark ? "hover:shadow-gray-900/50" : "hover:shadow-gray-100"
                   } animate-fade-in-up`}
                   style={{ animationDelay: `${i * 100}ms` }}
                 >
                   <div className="flex justify-between items-start gap-3 mb-3 sm:mb-4">
-                    <h3 className="text-lg sm:text-xl font-semibold group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                    <h3 className="text-lg sm:text-xl dark:group-hover:text-gray-300 transition-colors">
                       {proj.title}
                     </h3>
                     {proj.link && <ExternalLink className="w-5 h-5 flex-shrink-0 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />}
                   </div>
-                  <p className="mb-3 sm:mb-5 text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="mb-3 sm:mb-5 text-sm sm:text-base text-gray-500 dark:text-gray-500 leading-relaxed">
                     {proj.description}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {proj.tech.map((tech: string, j: number) => (
                       <span
                         key={j}
-                        className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-medium rounded-lg ${
-                          isDark ? "bg-gray-900 text-gray-300 border-gray-800" : "bg-gray-50 text-gray-700 border-gray-200"
-                        } border`}
+                        className={`px-3 py-1.5 text-xs font-sans rounded-lg bg-black text-white dark:bg-white dark:text-black border border-gray-200 dark:border-gray-800 hover:scale-110 transition-all ease-out hover:font-semibold`}
                       >
                         {tech}
                       </span>
@@ -310,24 +308,24 @@ export default function PortfolioPreview({
               </div>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Education</h2>
             </div>
-            <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-1">
               {portfolio.education.map((edu: Education, i: number) => (
                 <div 
                   key={i} 
                   className={`group relative p-5 sm:p-6 lg:p-8 rounded-xl ${
-                    isDark ? "bg-gray-950 border-gray-800 hover:border-gray-700" : "bg-white border-gray-200 hover:border-gray-300"
+                    isDark ? "bg-black border-gray-800 hover:border-gray-700" : "bg-white border-gray-200 hover:border-gray-300"
                   } border transition-all duration-500 hover:shadow-xl ${
                     isDark ? "hover:shadow-gray-900/50" : "hover:shadow-gray-100"
                   } animate-fade-in-up`}
                   style={{ animationDelay: `${i * 100}ms` }}
                 >
-                  <h3 className="text-base sm:text-lg font-semibold mb-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                  <h3 className="text-base sm:text-lg mb-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
                     {edu.degree}
                   </h3>
                   <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3">
                     {edu.school}
                   </p>
-                  <p className="text-xs sm:text-sm text-gray-500">
+                  <p className="text-sm bg-black text-white border inline-block rounded-md py-1 px-2  dark:bg-white dark:text-black hover:scale-110 transition-all ease-out  cursor-pointer">
                     {edu.year}
                   </p>
 
@@ -354,7 +352,7 @@ export default function PortfolioPreview({
                 <span
                   key={i}
                   className={`px-3 sm:px-5 py-2 sm:py-3 text-sm font-medium rounded-lg ${
-                    isDark ? "bg-gray-950 border-gray-800 hover:border-gray-700" : "bg-white border-gray-200 hover:border-gray-300"
+                    isDark ? "bg-white text-black border-gray-800 hover:border-gray-700" : "bg-white border-gray-200 hover:border-gray-300"
                   } border hover:shadow-lg transition-all duration-300 animate-fade-in`}
                   style={{ animationDelay: `${i * 30}ms` }}
                 >

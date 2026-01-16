@@ -225,22 +225,22 @@ export default function PortfolioPage() {
             <div className="space-y-6">
               {portfolio.experience.map((exp: Experience, i: number) => (
                 <div key={i} 
-                  className="group relative p-8 rounded-xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-500 hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-gray-900/50 animate-fade-in-up"
+                  className="group relative p-8 rounded-xl bg-white dark:bg-black border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-500 hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-gray-900/50 animate-fade-in-up"
                   style={{ animationDelay: `${i * 100}ms` }}>
                   
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                     <div>
-                      <h3 className="text-xl font-semibold mb-1 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                      <h3 className="text-xl mb-1 dark:group-hover:text-gray-300 transition-colors">
                         {exp.role}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400 font-medium">{exp.company}</p>
+                      <p className="text-gray-500 dark:text-gray-400 font-medium">{exp.company}</p>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-500 shrink-0">
                       <Calendar className="w-4 h-4" />
                       <span>{exp.duration}</span>
                     </div>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-gray-500 dark:text-gray-500 leading-relaxed">
                     {exp.description}
                   </p>
                   
@@ -261,15 +261,15 @@ export default function PortfolioPage() {
               <h2 className="text-3xl sm:text-4xl font-bold">Featured Projects</h2>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-1">
               {portfolio.projects.map((proj: Project, i: number) => (
                 <div key={i}
                   onClick={() => proj.link && window.open(proj.link, '_blank')}
-                  className="group relative p-8 rounded-xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-500 hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-gray-900/50 cursor-pointer animate-fade-in-up"
+                  className="group relative p-8 rounded-xl bg-white dark:bg-black border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-500 hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-gray-900/50 cursor-pointer animate-fade-in-up"
                   style={{ animationDelay: `${i * 100}ms` }}>
                   
                   <div className="flex items-start justify-between gap-3 mb-4">
-                    <h3 className="text-xl font-semibold group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                    <h3 className="text-xl font-medium  dark:group-hover:text-gray-300 transition-colors">
                       {proj.title}
                     </h3>
                     {proj.link && (
@@ -277,13 +277,13 @@ export default function PortfolioPage() {
                     )}
                   </div>
                   
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-5">
-                    {proj.description}
-                  </p>
+                  <p className="text-gray-500 leading-relaxed mb-6  transition-colors duration-500">
+            {proj.description}
+          </p>
                   
                   <div className="flex flex-wrap gap-2">
                     {proj.tech?.map((tech: string, j: number) => (
-                      <span key={j} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800">
+                      <span key={j} className="px-3 py-1.5 text-xs font-sans rounded-lg bg-black text-white dark:bg-white dark:text-black border border-gray-200 dark:border-gray-800 hover:scale-110 transition-all ease-out hover:font-semibold">
                         {tech}
                       </span>
                     ))}
@@ -306,17 +306,17 @@ export default function PortfolioPage() {
               <h2 className="text-3xl sm:text-4xl font-bold">Education</h2>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-1">
               {portfolio.education.map((edu: Education, i: number) => (
                 <div key={i}
-                  className="group p-8 rounded-xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-500 hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-gray-900/50 animate-fade-in-up"
+                  className="group p-8 rounded-xl bg-white dark:bg-black border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-500 hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-gray-900/50 animate-fade-in-up"
                   style={{ animationDelay: `${i * 100}ms` }}>
                   
-                  <h3 className="text-lg font-semibold mb-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                  <h3 className="text-lg  mb-2 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
                     {edu.degree}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-3">{edu.school}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500">{edu.year}</p>
+                  <p className="text-sm bg-black text-white border inline-block rounded-md py-1 px-2  dark:bg-white dark:text-black hover:scale-110 transition-all ease-out  cursor-pointer">{edu.year}</p>
 
                   <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-gray-200 via-gray-300 to-transparent dark:from-gray-800 dark:via-gray-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                 </div>
@@ -338,7 +338,7 @@ export default function PortfolioPage() {
             <div className="flex flex-wrap gap-3">
               {portfolio.skills.map((skill: string, i: number) => (
                 <span key={i}
-                  className="px-5 py-3 text-sm font-medium rounded-lg bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg transition-all duration-300 animate-fade-in"
+                  className="px-5 py-3 text-sm font-medium rounded-lg bg-white dark:bg-white dark:text-black  border border-gray-200 shadow-lg dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer hover:scale-110  ease-out "
                   style={{ animationDelay: `${i * 30}ms` }}>
                   {skill}
                 </span>

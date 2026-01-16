@@ -5,7 +5,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)', 
   '/sign-up(.*)',
   '/',
-  // '/((?!api).+)',  // ✅ All root slugs EXCEPT api routes
+  '/((?!api).+)',  // ✅ All root slugs EXCEPT api routes
 ])
 
 export default clerkMiddleware(async (auth, req) => {
