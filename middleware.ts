@@ -5,8 +5,9 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)', 
   '/sign-up(.*)',
   '/',
-  '/((?!api).+)',  // ✅ All root slugs EXCEPT api routes
+  '/:username'
 ])
+// '/((?!api).+)',  // ✅ All root slugs EXCEPT api routes
 
 export default clerkMiddleware(async (auth, req) => {
   // Skip auth protection for API routes entirely
