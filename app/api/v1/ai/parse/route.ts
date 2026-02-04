@@ -88,7 +88,7 @@ Extract the following fields in JSON format strictly matching this structure:
   "name": string,
   "title": string | null,
   "email": string | null,
-  "about": string,
+  "about": string | null,
   "status": string | null,
 
   "socialLinks": {
@@ -99,17 +99,17 @@ Extract the following fields in JSON format strictly matching this structure:
 
   "experience": [
     {
-      "role": string,
-      "company": string,
-      "duration": string,
-      "description": string
+      "role": string | null,
+      "company": string | null,
+      "duration": string | null,
+      "description": string | null
     }
   ],
 
   "projects": [
     {
-      "title": string,
-      "description": string,
+      "title": string | null,
+      "description": string | null,
       "tech": [string],
       "link": string | null
     }
@@ -117,9 +117,9 @@ Extract the following fields in JSON format strictly matching this structure:
 
   "education": [
     {
-      "degree": string,
-      "school": string,
-      "year": string
+      "degree": string | null,
+      "school": string | null,
+      "year": string | null
     }
   ],
 
