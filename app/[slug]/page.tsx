@@ -84,6 +84,12 @@ export default function PortfolioPage() {
   getPortfolio();
 }, [slug]);
 
+useEffect(() => {
+  if (portfolio?.name) {
+    document.title = `${portfolio.name} — Portfolio`;
+  }
+}, [portfolio]);
+
 
   useEffect(() => {
     const handleScroll = () => {
