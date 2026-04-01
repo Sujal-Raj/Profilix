@@ -214,7 +214,7 @@ export function PortfolioDashboard({ data, onPreview }: { data: PortfolioData; o
           <div className="flex items-center gap-3 flex-wrap">
             <button
               onClick={onPreview}
-              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 hover:gap-3"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 hover:gap-3 cursor-pointer"
             >
               Edit Portfolio
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -222,7 +222,7 @@ export function PortfolioDashboard({ data, onPreview }: { data: PortfolioData; o
             <button
               onClick={handlePublish}
               disabled={isSaving}
-              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 hover:gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 hover:gap-3 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               <Save size={14} className="flex-shrink-0" />
               {isSaving ? "Publishing..." : "Publish Portfolio"}
