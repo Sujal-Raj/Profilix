@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Upload, Sparkles, ArrowRight, Briefcase, GraduationCap, Code2, User, ExternalLink, Github, Linkedin, Twitter, CheckCircle2, Save, Check, Copy } from "lucide-react";
-import { useUser } from "@clerk/clerk-react";
+import { Upload, Sparkles, ArrowRight, Briefcase, GraduationCap, Code2, User, ExternalLink, Github, Linkedin, Twitter, CheckCircle2, Save, Check, Copy, ChevronRight, Layers, Pencil, Globe } from "lucide-react";
+import { UserButton, useUser } from "@clerk/clerk-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/ToastContext";
 import Link from "next/link";
+import { SignedIn } from "@clerk/nextjs";
 
 interface PortfolioData {
   name: string;
@@ -129,9 +130,11 @@ export function PortfolioDashboard({ data, onPreview }: { data: PortfolioData; o
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [publishedSlug, setPublishedSlug] = useState<string>("");
   const [copied, setCopied] = useState(false);
+  const [bannerVisible, setBannerVisible] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setHeaderVisible(true), 50);
+    const t2 = setTimeout(() => setBannerVisible(true), 200);
     return () => clearTimeout(t);
   }, []);
 
@@ -188,14 +191,39 @@ export function PortfolioDashboard({ data, onPreview }: { data: PortfolioData; o
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
 
-        {/* ── Header ── */}
+         {/* ── Top Nav Bar ── */}
         <div
+          className={`flex items-center justify-between transition-all duration-500 ${
+            headerVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <Link href={"/"}>
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-200 uppercase tracking-widest hover:cursor-pointer">
+              Profilix
+            </span>
+            </Link>
+            <ChevronRight className="w-3 h-3 text-gray-300 dark:text-gray-400" />
+            <span className="text-xs text-gray-400 dark:text-gray-300">Dashboard</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Avatar */}
+            {/* <div className="w-7 h-7 rounded-lg bg-black dark:bg-white flex items-center justify-center text-white dark:text-black text-[10px] font-bold">
+              {initials}
+            </div> */}
+            <SignedIn>
+        <UserButton />
+      </SignedIn>
+          </div>
+        </div>
+
+        {/* ── Header ── */}
+        {/* <div
           className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-all duration-500 ${
             headerVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
           }`}
         >
           <div className="flex items-center gap-4">
-            {/* Avatar */}
             <div className="relative flex-shrink-0 w-14 h-14 rounded-2xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-black text-lg font-bold shadow-md">
               {initials}
               <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-gray-50 dark:border-[#0a0a0a]" />
@@ -210,7 +238,6 @@ export function PortfolioDashboard({ data, onPreview }: { data: PortfolioData; o
             </div>
           </div>
 
-          {/* Status pill + CTA */}
           <div className="flex items-center gap-3 flex-wrap">
             <button
               onClick={onPreview}
@@ -228,13 +255,88 @@ export function PortfolioDashboard({ data, onPreview }: { data: PortfolioData; o
               {isSaving ? "Publishing..." : "Publish Portfolio"}
             </button>
           </div>
+        </div> */}
+
+         {/* ── Publish Action Banner ── */}
+        <div
+          className={`rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black overflow-hidden transition-all duration-500 ${
+            bannerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+          }`}
+        >
+          {/* Green status bar at top */}
+          <div className="h-0.5 w-full bg-emerald-500" />
+ 
+          <div className="p-6 flex flex-col sm:flex-row sm:items-center gap-5">
+            {/* Left: identity */}
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div className="relative flex-shrink-0 w-12 h-12 rounded-xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-black text-base font-bold">
+                {initials}
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-black" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-base font-bold text-black dark:text-white leading-tight truncate">
+                    {data.name || "—"}
+                  </h1>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-900 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                    Ready to publish
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                  {data.title || "No title set"}
+                </p>
+              </div>
+            </div>
+ 
+            {/* Right: CTAs */}
+            <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+              <button
+                onClick={onPreview}
+                className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black text-black dark:text-white text-sm font-medium hover:border-gray-400 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-950 transition-all duration-200 cursor-pointer"
+              >
+                <Pencil className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
+                Edit sections
+              </button>
+              <button
+                onClick={handlePublish}
+                disabled={isSaving}
+                className="group inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer active:scale-[0.98]"
+              >
+                <Globe className="w-3.5 h-3.5 flex-shrink-0" />
+                {isSaving ? "Publishing…" : "Publish & Go Live"}
+                {!isSaving && (
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+                )}
+              </button>
+            </div>
+          </div>
+ 
+          {/* Bottom hint bar */}
+          <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-900 bg-gray-50 dark:bg-[#0a0a0a] flex items-center gap-2">
+            <Layers className="w-3 h-3 text-gray-400 dark:text-gray-300 flex-shrink-0" />
+            <p className="text-xs text-gray-500 dark:text-gray-300">
+              Your portfolio is ready — publish now to get a live URL, or edit any section first.
+            </p>
+          </div>
         </div>
 
-        <div>
-          <p className="mt-2 text-sm text-gray-900 dark:text-white font-semibold">
-            Your portfolio is already set up and live. You can preview it or edit any section. Publish your changes to update the portfolio.
-          </p>
-        </div>
+        {/* <div
+  style={{
+    backgroundColor: "#0f172a",
+    border: "1px solid #1e293b",
+    borderRadius: "8px",
+    padding: "12px 16px",
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "10px",
+  }}
+>
+  <span style={{ fontSize: "16px", marginTop: "1px", flexShrink: 0 }}>ℹ️</span>
+  <p className="text-sm text-slate-300" style={{ margin: 0, fontWeight: 400, lineHeight: "1.6" }}>
+  Your portfolio is ready — publish it now to get your live URL, or edit any section first before publishing.
+</p>
+</div> */}
 
         {/* ── Stats Row ── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
