@@ -5,26 +5,29 @@ import {
   GoogleGenerativeAI,
   GenerateContentResult,
 } from "@google/generative-ai";
+
 import UserModel from "@/models/user.model";
 import PortfolioModel from "@/models/portfolio.model";
 import { dbConnect } from "@/lib/db";
+
 import slugify from "slugify";
 import { nanoid } from "nanoid";
 import { Buffer } from "buffer";
 
-/* ---------------------------------- TYPES --------------------------------- */
+import { jsonrepair } from "jsonrepair";
 
-type AIError = {
-  message?: string;
-  name?: string;
-  status?: number;
-};
+/* -------------------------------------------------------------------------- */
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+/* -------------------------------------------------------------------------- */
 
 type ParsedResume = {
-  name: string;
+  name: string | null;
   title: string | null;
   email: string | null;
-  about: string;
+  phone: string | null;
+  about: string | null;
   status: string | null;
 
   socialLinks: {
@@ -34,37 +37,259 @@ type ParsedResume = {
   };
 
   experience: {
-    role: string;
-    company: string;
-    duration: string;
-    description: string;
+    role: string | null;
+    company: string | null;
+    duration: string | null;
+    description: string | null;
   }[];
 
   projects: {
-    title: string;
-    description: string;
+    title: string | null;
+    description: string | null;
     tech: string[];
     link: string | null;
   }[];
 
   education: {
-    degree: string;
-    school: string;
-    year: string;
+    degree: string | null;
+    school: string | null;
+    year: string | null;
   }[];
 
   skills: string[];
 };
 
 /* -------------------------------------------------------------------------- */
+/*                               FALLBACK DATA                                */
+/* -------------------------------------------------------------------------- */
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+function extractFallbackData(text: string) {
+  const email =
+    text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || null;
+
+  const phone =
+    text.match(
+      /(\+?\d{1,3}[-.\s]?)?(\(?\d{3,5}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{4}/
+    )?.[0] || null;
+
+  const linkedin =
+    text.match(/https?:\/\/(www\.)?linkedin\.com\/[^\s]+/i)?.[0] || null;
+
+  const github =
+    text.match(/https?:\/\/(www\.)?github\.com\/[^\s]+/i)?.[0] || null;
+
+  const twitter =
+    text.match(/https?:\/\/(www\.)?(twitter|x)\.com\/[^\s]+/i)?.[0] || null;
+
+  // crude name detection
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  let name: string | null = null;
+
+  for (const line of lines.slice(0, 10)) {
+    if (
+      line.length > 2 &&
+      line.length < 50 &&
+      /^[A-Za-z\s]+$/.test(line)
+    ) {
+      name = line;
+      break;
+    }
+  }
+
+  return {
+    name,
+    email,
+    phone,
+    socialLinks: {
+      github,
+      linkedin,
+      twitter,
+    },
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/*                             SAFE NORMALIZATION                             */
+/* -------------------------------------------------------------------------- */
+
+// function normalizeResume(data: Record<string, unknown>): ParsedResume {
+//   return {
+//     name: data?.name || null,
+//     title: data?.title || null,
+//     email: data?.email || null,
+//     phone: data?.phone || null,
+//     about: data?.about || null,
+//     status: data?.status || null,
+
+//     socialLinks: {
+//       github: data?.socialLinks?.github || null,
+//       linkedin: data?.socialLinks?.linkedin || null,
+//       twitter: data?.socialLinks?.twitter || null,
+//     },
+
+//     experience: Array.isArray(data?.experience)
+//       ? data.experience.map((e: {
+//             role?: string;
+//             company?: string;
+//             duration?: string;
+//             description?: string;
+//           }) => ({
+//           role: e?.role || null,
+//           company: e?.company || null,
+//           duration: e?.duration || null,
+//           description: e?.description || null,
+//         }))
+//       : [],
+
+//     projects: Array.isArray(data?.projects)
+//       ? data.projects.map((p: any) => ({
+//           title: p?.title || null,
+//           description: p?.description || null,
+//           tech: Array.isArray(p?.tech) ? p.tech : [],
+//           link: p?.link || null,
+//         }))
+//       : [],
+
+//     education: Array.isArray(data?.education)
+//       ? data.education.map((e: any) => ({
+//           degree: e?.degree || null,
+//           school: e?.school || null,
+//           year: e?.year || null,
+//         }))
+//       : [],
+
+//     skills: Array.isArray(data?.skills)
+//       ? [...new Set(data.skills.filter((s: any) => typeof s === 'string'))] as string[]
+//       : [],
+//   };
+// }
+
+function normalizeResume(
+  data: Record<string, unknown>
+): ParsedResume {
+  const safeData = data as {
+    name?: string;
+    title?: string;
+    email?: string;
+    phone?: string;
+    about?: string;
+    status?: string;
+
+    socialLinks?: {
+      github?: string;
+      linkedin?: string;
+      twitter?: string;
+    };
+
+    experience?: {
+      role?: string;
+      company?: string;
+      duration?: string;
+      description?: string;
+    }[];
+
+    projects?: {
+      title?: string;
+      description?: string;
+      tech?: string[];
+      link?: string;
+    }[];
+
+    education?: {
+      degree?: string;
+      school?: string;
+      year?: string;
+    }[];
+
+    skills?: unknown[];
+  };
+
+  return {
+    name: safeData.name || null,
+    title: safeData.title || null,
+    email: safeData.email || null,
+    phone: safeData.phone || null,
+    about: safeData.about || null,
+    status: safeData.status || null,
+
+    socialLinks: {
+      github: safeData.socialLinks?.github || null,
+      linkedin: safeData.socialLinks?.linkedin || null,
+      twitter: safeData.socialLinks?.twitter || null,
+    },
+
+    experience: Array.isArray(safeData.experience)
+      ? safeData.experience.map(
+          (e: {
+            role?: string;
+            company?: string;
+            duration?: string;
+            description?: string;
+          }) => ({
+            role: e.role || null,
+            company: e.company || null,
+            duration: e.duration || null,
+            description: e.description || null,
+          })
+        )
+      : [],
+
+    projects: Array.isArray(safeData.projects)
+      ? safeData.projects.map(
+          (p: {
+            title?: string;
+            description?: string;
+            tech?: string[];
+            link?: string;
+          }) => ({
+            title: p.title || null,
+            description: p.description || null,
+            tech: Array.isArray(p.tech) ? p.tech : [],
+            link: p.link || null,
+          })
+        )
+      : [],
+
+    education: Array.isArray(safeData.education)
+      ? safeData.education.map(
+          (e: {
+            degree?: string;
+            school?: string;
+            year?: string;
+          }) => ({
+            degree: e.degree || null,
+            school: e.school || null,
+            year: e.year || null,
+          })
+        )
+      : [],
+
+    skills: Array.isArray(safeData.skills)
+      ? [
+          ...new Set(
+            safeData.skills.filter(
+              (s: unknown): s is string =>
+                typeof s === "string"
+            )
+          ),
+        ]
+      : [],
+  };
+}
+
+
+/* -------------------------------------------------------------------------- */
 
 export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
     const formData = await req.formData();
+
     const file = formData.get("resume");
     const currentUser = formData.get("currentUser");
 
@@ -76,18 +301,36 @@ export async function POST(req: NextRequest) {
     }
 
     const bytes = new Uint8Array(await file.arrayBuffer());
-    console.log("Got resume file, size:", bytes.length);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+    });
 
     const prompt = `
-You are an AI that extracts structured information from resumes.
-Extract the following fields in JSON format strictly matching this structure:
+You are an AI resume parser designed for highly unreliable and diverse resume formats.
+
+CRITICAL RULES:
+- NEVER fail
+- ALWAYS return valid JSON
+- NEVER omit keys
+- Use null for missing values
+- Use [] for missing arrays
+- Extract ANY identifiable information possible
+- At minimum try to extract:
+  - name
+  - email
+  - phone
+  - links
+
+STRICT JSON ONLY.
+
+Schema:
 
 {
-  "name": string,
+  "name": string | null,
   "title": string | null,
   "email": string | null,
+  "phone": string | null,
   "about": string | null,
   "status": string | null,
 
@@ -125,95 +368,132 @@ Extract the following fields in JSON format strictly matching this structure:
 
   "skills": [string]
 }
-
-Notes for extraction:
-- Use null for missing fields.
-- Convert paragraphs into clean sentences.
-- Extract only real skills & technologies.
-- Duration should be in readable form (e.g., "2020 - 2022").
-- If project technologies are not listed, infer reasonable tech based on context.
-- If multiple emails or links appear, choose the most professional.
 `;
-
-    let result: GenerateContentResult;
-
-    try {
-      result = await model.generateContent([
-        { text: prompt },
-        {
-          inlineData: {
-            data: Buffer.from(bytes).toString("base64"),
-            mimeType: "application/pdf",
-          },
-        },
-      ]);
-    } catch (error: unknown) {
-      const err = error as AIError;
-
-      console.error("AI generation failed:", err);
-      return NextResponse.json(
-        {
-          error: "AI generation failed",
-          details: err?.message || String(err),
-          name: err?.name,
-          status: err?.status,
-        },
-        { status: 500 }
-      );
-    }
 
     let text = "";
 
     try {
-      if (
-        result.response &&
-        typeof result.response.text === "function"
-      ) {
-        text = result.response.text();
-      } else {
-        text = JSON.stringify(result);
-      }
-    } catch (error) {
-      console.error("Error reading Gemini response:", error);
-      text = String(result);
+      const result: GenerateContentResult =
+        await model.generateContent([
+          { text: prompt },
+          {
+            inlineData: {
+              data: Buffer.from(bytes).toString("base64"),
+              mimeType: file.type || "application/pdf",
+            },
+          },
+        ]);
+
+      text = result.response.text();
+    } catch (err) {
+      console.error("Gemini failed:", err);
     }
 
-    const cleaned = text.replace(/```json|```/g, "").trim();
+    /* ---------------------------------------------------------------------- */
+    /*                             CLEAN AI OUTPUT                            */
+    /* ---------------------------------------------------------------------- */
 
-    let parsedJson: ParsedResume;
+    const cleaned = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    // let parsed: any = null;
+     let parsed: Record<string, any> | null = null;
 
     try {
-      parsedJson = JSON.parse(cleaned) as ParsedResume;
-    } catch (error) {
-      console.error("Failed to parse AI response as JSON", error, cleaned);
+      parsed = JSON.parse(cleaned);
+    } catch {
+      try {
+        parsed = JSON.parse(jsonrepair(cleaned));
+      } catch {
+        parsed = null;
+      }
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /*                          FALLBACK EXTRACTION                           */
+    /* ---------------------------------------------------------------------- */
+
+    const rawText = cleaned || text;
+
+    const fallback = extractFallbackData(rawText);
+
+    const merged = {
+      ...parsed,
+
+      name: parsed?.name || fallback.name,
+      email: parsed?.email || fallback.email,
+      phone: parsed?.phone || fallback.phone,
+
+      socialLinks: {
+        github:
+          parsed?.socialLinks?.github ||
+          fallback.socialLinks.github,
+
+        linkedin:
+          parsed?.socialLinks?.linkedin ||
+          fallback.socialLinks.linkedin,
+
+        twitter:
+          parsed?.socialLinks?.twitter ||
+          fallback.socialLinks.twitter,
+      },
+    };
+
+    const parsedJson = normalizeResume(merged);
+
+    /* ---------------------------------------------------------------------- */
+    /*                           LAST SAFETY CHECK                            */
+    /* ---------------------------------------------------------------------- */
+
+    if (
+      !parsedJson.name &&
+      !parsedJson.email &&
+      !parsedJson.phone
+    ) {
       return NextResponse.json(
         {
-          error: "Failed to parse AI response as JSON",
-          raw: cleaned,
-          rawFull: text,
+          error:
+            "Could not extract meaningful data from resume",
         },
-        { status: 500 }
+        { status: 422 }
       );
     }
 
+    /* ---------------------------------------------------------------------- */
+    /*                               SAVE LOGIC                               */
+    /* ---------------------------------------------------------------------- */
+
     if (typeof currentUser === "string") {
-      const user = await UserModel.findOne({ email: currentUser });
+      const user = await UserModel.findOne({
+        email: currentUser,
+      });
 
       if (!user) {
         return NextResponse.json(
           {
-            message: "User not found - returning parsed data for preview",
+            message:
+              "User not found - returning preview",
             portfolio: parsedJson,
           },
           { status: 200 }
         );
       }
 
-      const name = user.name || parsedJson.name || "portfolio";
-      const baseSlug = slugify(name, { lower: true });
+      const name =
+        user.name || parsedJson.name || "portfolio";
+
+      const baseSlug = slugify(name, {
+        lower: true,
+      });
+
       let slug = baseSlug;
 
-      const existing = await PortfolioModel.findOne({ slug });
+      const existing = await PortfolioModel.findOne({
+        slug,
+      });
+
       if (existing) {
         slug = `${baseSlug}-${nanoid(4)}`;
       }
@@ -227,24 +507,36 @@ Notes for extraction:
       await portfolio.save();
 
       user.portfolio = portfolio._id;
+
       await user.save();
 
       return NextResponse.json(
-        { message: "Portfolio saved successfully", portfolio },
+        {
+          message: "Portfolio saved successfully",
+          portfolio,
+        },
         { status: 200 }
       );
     }
 
     return NextResponse.json(
-      { message: "Parsed (preview)", portfolio: parsedJson },
+      {
+        message: "Resume parsed successfully",
+        portfolio: parsedJson,
+      },
       { status: 200 }
     );
   } catch (error: unknown) {
-    const err = error as Error;
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Internal server error";
+    console.error(error);
 
-    console.error("Unhandled error in resume route:", err);
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      {
+        error: message || "Internal server error",
+      },
       { status: 500 }
     );
   }
