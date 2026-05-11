@@ -391,7 +391,7 @@ Schema:
       .trim();
 
     // let parsed: any = null;
-     let parsed: Record<string, any> | null = null;
+     let parsed: Record<string, unknown> | null = null;
 
     try {
       parsed = JSON.parse(cleaned);
@@ -408,6 +408,13 @@ Schema:
 
     const fallback = extractFallbackData(rawText);
 
+    const parsedSocialLinks =
+      (parsed?.socialLinks as {
+        github?: string | null;
+        linkedin?: string | null;
+        twitter?: string | null;
+      }) || {};
+
     const merged = {
       ...parsed,
 
@@ -417,15 +424,15 @@ Schema:
 
       socialLinks: {
         github:
-          parsed?.socialLinks?.github ||
+          parsedSocialLinks.github ||
           fallback.socialLinks.github,
 
         linkedin:
-          parsed?.socialLinks?.linkedin ||
+          parsedSocialLinks.linkedin ||
           fallback.socialLinks.linkedin,
 
         twitter:
-          parsed?.socialLinks?.twitter ||
+          parsedSocialLinks.twitter ||
           fallback.socialLinks.twitter,
       },
     };
