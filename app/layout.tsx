@@ -4,7 +4,9 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import AuthProvider from "@/components/AuthProvider";
 import { ToastProvider } from "@/components/ui/ToastContext";
-import { Analytics } from "@vercel/analytics/next";
+import "./globals.css"
+import { GoogleAnalytics } from '@next/third-parties/google'
+// import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +43,7 @@ export default function RootLayout({
         </AuthProvider>
         <Analytics />
       </body>
+      <GoogleAnalytics gaId="G-L7B1YY7207"/>
     </html>
     </ClerkProvider>
   );
