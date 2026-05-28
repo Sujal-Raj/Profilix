@@ -31,6 +31,10 @@ export const metadata: Metadata = {
     "AI portfolio creator",
   ],
   authors: [{ name: "Sujal Raj" }],
+
+   verification: {
+    google: "XLoXKiiy9vm68qW13slahLYigWWAkdXv8A1syftU-N8",
+  },
 };
 
 export default function RootLayout({
