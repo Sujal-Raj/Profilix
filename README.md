@@ -317,4 +317,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 [⬆ Back to Top](#-profilix---ai-powered-portfolio-generator)
 
+**Profilix V2.0 is under build. And coming up soon.**
+
 </div>
