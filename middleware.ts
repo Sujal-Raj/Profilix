@@ -5,7 +5,8 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)', 
   '/sign-up(.*)',
   '/',
-  '/:username'
+  '/:username',
+  '/preview/:path*'
 ])
 // '/((?!api).+)',  // ✅ All root slugs EXCEPT api routes
 

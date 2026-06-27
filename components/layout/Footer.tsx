@@ -80,7 +80,7 @@ export default function Footer() {
           {/* Copyright */}
           <div className="text-center md:text-left">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              © 2024 Profilix. All rights reserved.
+              © 2026 Profilix. All rights reserved.
             </p>
           </div>
 
@@ -102,14 +102,14 @@ export default function Footer() {
         {/* Additional links */}
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-wrap justify-center gap-6 text-sm">
-            <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300 relative group">
+            <Link href={"/privacy-policy"} className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300 relative group">
               Privacy Policy
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black dark:bg-white group-hover:w-full transition-all duration-300" />
-            </a>
-            <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300 relative group">
+            </Link>
+            <Link href="/terms-of-service" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300 relative group">
               Terms of Service
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black dark:bg-white group-hover:w-full transition-all duration-300" />
-            </a>
+            </Link>
             <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors duration-300 relative group">
               Contact
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black dark:bg-white group-hover:w-full transition-all duration-300" />

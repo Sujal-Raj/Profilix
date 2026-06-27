@@ -1,6 +1,12 @@
 import PortfolioModel from "@/models/portfolio.model";
 import { NextRequest, NextResponse } from "next/server";
 import {dbConnect} from "@/lib/db"; 
+// import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
+// import { NextRequest, NextResponse } from "next/server";
+
+// import connectDB from "@/lib/mongodb";
+// import PortfolioModel from "@/models/Portfolio";
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,4 +48,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
 

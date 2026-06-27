@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;900&family=Barlow:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -22,5 +25,62 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif,Sora,;
+}
+
+
+/* ── Glassmorphism Portfolio — add these to your existing globals.css ── */
+
+
+html {
+  scroll-behavior: smooth;
+}
+ 
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+ 
+::selection {
+  background: #000;
+  color: #fff;
+}
+ 
+::-webkit-scrollbar {
+  width: 4px;
+}
+ 
+::-webkit-scrollbar-track {
+  background: #fff;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #e5e5e5;
+  border-radius: 99px;
+}
+ 
+::-webkit-scrollbar-thumb:hover {
+  background: #000;
+}
+
+
+::selection {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+ 
+::-webkit-scrollbar {
+  width: 6px;
+}
+ 
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 99px;
+}
+ 
+::-webkit-scrollbar-thumb:hover {
+  background: #1a1a1a;
 }
