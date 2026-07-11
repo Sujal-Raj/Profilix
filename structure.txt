@@ -1,69 +1,97 @@
-portfilio-generator/
-├─ components.json
-├─ Contributing.md
-├─ eslint.config.mjs
-├─ middleware.ts
-├─ next-env.d.ts
-├─ next.config.ts
-├─ package.json
-├─ postcss.config.mjs
-├─ postman_collection.json
-├─ README.md
-├─ tsconfig.json
-├─ app/
-│  ├─ globals.css
-│  ├─ layout.tsx
-│  ├─ page.tsx
-│  ├─ [slug]/
-│  │  └─ page.tsx
-│  ├─ api/
-│  │  ├─ test/
-│  │  │  └─ route.ts
-│  │  ├─ v1/
-│  │  │  ├─ ai/
-│  │  │  │  └─ parse/
-│  │  │  │     └─ route.ts
-│  │  │  ├─ auth/
-│  │  │  │  └─ register/
-│  │  │  │     └─ route.ts
-│  │  │  └─ user/
-│  │  │     ├─ route.ts
-│  │  │     ├─ [slug]/
-│  │  │     │  └─ route.ts
-│  │  │     └─ fetchportfolio/
-│  │  │        └─ route.ts
-│  │  └─ v2/
+.clerk/
+.env
+.git/
+.github/
+.next/
+app/
+├─ globals.css
+├─ layout.tsx
+├─ page.tsx
+├─ [slug]/
+│  └─ page.tsx
+├─ api/
+│  ├─ test/
+│  │  └─ route.ts
+│  ├─ v1/
+│  │  ├─ ai/
+│  │  │  └─ parse/
+│  │  │     └─ route.ts
+│  │  ├─ auth/
+│  │  │  └─ register/
+│  │  │     └─ route.ts
+│  │  └─ user/
+│  │     ├─ route.ts
+│  │     ├─ [slug]/
+│  │     │  └─ route.ts
+│  │     └─ fetchportfolio/
+│  │        └─ route.ts
+│  └─ v2/
+├─ (web)/
 │  ├─ create/
 │  │  └─ portfolio/
 │  │     └─ page.tsx
-│  ├─ getportfolio/
-│  │  └─ page.tsx
-│  └─ preview/
-│     └─ portfolio/
-│        └─ page.tsx
-├─ components/
-│  ├─ AuthProvider.ts
-│  ├─ layout/
-│  │  ├─ Footer.tsx
-│  │  ├─ HomePage.tsx
-│  │  ├─ HowItWorks.tsx
-│  │  └─ Navbar.tsx
-│  ├─ portfolio/
-│  │  ├─ EditForm/
-│  │  │  └─ page.tsx
-│  │  └─ PortfolioPreview/
+│  ├─ preview/
+│  │  └─ portfolio/
 │  │     └─ page.tsx
-│  └─ ui/
-│     ├─ animated-shiny-text.tsx
-│     ├─ light-rays.tsx
-│     ├─ ToastContext.tsx
-│     └─ word-rotate.tsx
-├─ lib/
-│  ├─ db.ts
-│  └─ utils.ts
-├─ models/
-│  ├─ portfolio.model.ts
-│  └─ user.model.ts
-├─ public/
-└─ store/
-   └─ useUserStore.ts
+│  ├─ privacy-policy/
+│  │  └─ page.tsx
+│  └─ terms-of-service/
+│     └─ page.tsx
+├─ designs/
+│  ├─ clayMorphism.tsx
+│  ├─ cyberPunk.tsx
+│  ├─ glassMorphism.tsx
+│  ├─ minimalism.tsx
+│  ├─ NeoBrutalism.tsx
+│  └─ swissStyle.tsx
+└─ preview/
+   ├─ claymorphism/
+   │  └─ page.tsx
+   ├─ minimal/
+   │  └─ page.tsx
+   ├─ neobrutalism/
+   │  └─ page.tsx
+   ├─ original/
+   │  └─ page.tsx
+   └─ swissstyle/
+      └─ page.tsx
+components/
+├─ AuthProvider.ts
+├─ layout/
+│  ├─ Footer.tsx
+│  ├─ HomePage.tsx
+│  ├─ HowItWorks.tsx
+│  └─ Navbar.tsx
+├─ portfolio/
+│  ├─ EditForm/
+│  │  └─ page.tsx
+│  └─ PortfolioPreview/
+│     └─ page.tsx
+└─ ui/
+   ├─ animated-shiny-text.tsx
+   ├─ light-rays.tsx
+   ├─ ToastContext.tsx
+   └─ word-rotate.tsx
+components.json
+Contributing.md
+eslint.config.mjs
+lib/
+├─ db.ts
+└─ utils.ts
+middleware.ts
+models/
+├─ portfolio.model.ts
+└─ user.model.ts
+next-env.d.ts
+next.config.ts
+node_modules/
+package-lock.json
+package.json
+postcss.config.mjs
+postman_collection.json
+public/
+README.md
+tsconfig.json
+store/
+└─ useUserStore.ts
+structure.txt

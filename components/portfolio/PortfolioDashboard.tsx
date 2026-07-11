@@ -19,11 +19,15 @@ import {
   Globe,
   Sparkles,
   CheckCircle2,
-  Eye,
   Layout,
-  ChevronDown,
+  Lock,
+  Eye,
+  ShoppingCart,
+  Star,
+  Crown,
+  ImageOff,
 } from "lucide-react";
-import { UserButton, useUser } from "@clerk/clerk-react";
+import { UserButton } from "@clerk/clerk-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { SignedIn } from "@clerk/nextjs";
@@ -45,385 +49,47 @@ interface PortfolioData {
   selectedTemplate?: string;
 }
 
-interface TemplateDefinition {
-  id: string;
+interface ApiTemplate {
+  _id: string;
   name: string;
-  description: string;
-  tag: string;
-  palette: string[];   // 3 hex colors shown as swatches
-  preview: React.FC;   // inline SVG preview
+  slug: string;
+  thumbnail: string;
+  price: number;
+  isFree: boolean;
+  isActive: boolean;
+  isPurchased?: boolean;
+  isAccessible?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-// ─── Template Previews (SVG thumbnails) ───────────────────────────────────────
+// ─── Preview Map (local SVG fallback thumbnails) ──────────────────────────────
+// Only used if thumbnail image fails to load
 
 function OriginalPreview() {
   return (
     <svg viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* bg */}
       <rect width="200" height="130" fill="#0a0a0a" />
-      {/* top bar */}
       <rect x="0" y="0" width="200" height="18" fill="#111111" />
       <rect x="12" y="6" width="28" height="5" rx="2" fill="#333" />
       <rect x="152" y="5" width="36" height="7" rx="3" fill="#ffffff" opacity="0.9" />
-      {/* hero area */}
       <rect x="12" y="28" width="40" height="40" rx="8" fill="#1e1e1e" />
       <rect x="16" y="32" width="32" height="32" rx="6" fill="#2a2a2a" />
       <text x="32" y="52" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="bold">AB</text>
       <rect x="60" y="32" width="60" height="6" rx="2" fill="#fff" opacity="0.9" />
       <rect x="60" y="42" width="40" height="4" rx="1.5" fill="#555" />
       <rect x="60" y="50" width="50" height="4" rx="1.5" fill="#444" />
-      {/* stats row */}
       <rect x="12" y="76" width="42" height="22" rx="5" fill="#1a1a1a" stroke="#222" strokeWidth="0.5" />
       <rect x="60" y="76" width="42" height="22" rx="5" fill="#1a1a1a" stroke="#222" strokeWidth="0.5" />
       <rect x="108" y="76" width="42" height="22" rx="5" fill="#1a1a1a" stroke="#222" strokeWidth="0.5" />
       <rect x="156" y="76" width="32" height="22" rx="5" fill="#1a1a1a" stroke="#222" strokeWidth="0.5" />
-      <text x="33" y="91" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">8</text>
-      <text x="81" y="91" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">3</text>
-      <text x="129" y="91" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">2</text>
-      <text x="172" y="91" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">4</text>
-      {/* content blocks */}
-      <rect x="12" y="106" width="118" height="18" rx="5" fill="#1a1a1a" stroke="#222" strokeWidth="0.5" />
-      <rect x="138" y="106" width="50" height="18" rx="5" fill="#1a1a1a" stroke="#222" strokeWidth="0.5" />
-      <rect x="16" y="110" width="40" height="3" rx="1" fill="#444" />
-      <rect x="16" y="116" width="55" height="3" rx="1" fill="#333" />
-      <rect x="142" y="110" width="30" height="3" rx="1" fill="#444" />
-      <rect x="142" y="116" width="20" height="3" rx="1" fill="#333" />
     </svg>
   );
 }
 
-function MinimalPreview() {
-  return (
-    <svg viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* bg */}
-      <rect width="200" height="130" fill="#fafafa" />
-      {/* top nav line */}
-      <rect x="0" y="0" width="200" height="1" fill="#e5e5e5" />
-      <rect x="16" y="8" width="24" height="4" rx="1" fill="#111" />
-      <rect x="160" y="6" width="24" height="8" rx="2" fill="#111" />
-      {/* hero - centered */}
-      <rect x="75" y="28" width="50" height="50" rx="25" fill="#f0f0f0" />
-      <text x="100" y="57" textAnchor="middle" fill="#333" fontSize="11" fontWeight="bold">AB</text>
-      <rect x="55" y="82" width="90" height="6" rx="2" fill="#111" />
-      <rect x="70" y="92" width="60" height="4" rx="1.5" fill="#aaa" />
-      {/* divider */}
-      <rect x="16" y="104" width="168" height="0.5" fill="#e5e5e5" />
-      {/* skill pills */}
-      <rect x="16" y="110" width="28" height="10" rx="5" fill="#f0f0f0" />
-      <rect x="48" y="110" width="36" height="10" rx="5" fill="#f0f0f0" />
-      <rect x="88" y="110" width="28" height="10" rx="5" fill="#f0f0f0" />
-      <rect x="120" y="110" width="44" height="10" rx="5" fill="#f0f0f0" />
-      <text x="30" y="117" textAnchor="middle" fill="#555" fontSize="5">React</text>
-      <text x="66" y="117" textAnchor="middle" fill="#555" fontSize="5">TypeScript</text>
-      <text x="104" y="117" textAnchor="middle" fill="#555" fontSize="5">Next</text>
-      <text x="142" y="117" textAnchor="middle" fill="#555" fontSize="5">Tailwind</text>
-    </svg>
-  );
-}
-
-function NeoBrutalismPreview() {
-  return (
-    <svg
-      viewBox="0 0 200 130"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-    >
-      {/* background */}
-      <rect width="200" height="130" fill="#FFD60A" />
-
-      {/* navbar */}
-      <rect x="15" y="10" width="170" height="16" fill="#fff" stroke="#000" strokeWidth="2" />
-      <rect x="22" y="15" width="30" height="4" fill="#000" />
-      <rect x="152" y="13" width="24" height="8" fill="#FF4D6D" stroke="#000" strokeWidth="2" />
-
-      {/* avatar shadow */}
-      <rect x="79" y="34" width="42" height="42" fill="#000" />
-      {/* avatar */}
-      <rect
-        x="74"
-        y="29"
-        width="42"
-        height="42"
-        fill="#00E5FF"
-        stroke="#000"
-        strokeWidth="2"
-      />
-      <text
-        x="95"
-        y="54"
-        textAnchor="middle"
-        fill="#000"
-        fontSize="11"
-        fontWeight="900"
-      >
-        AB
-      </text>
-
-      {/* title shadow */}
-      <rect x="58" y="82" width="84" height="8" fill="#000" />
-      {/* title */}
-      <rect
-        x="54"
-        y="78"
-        width="84"
-        height="8"
-        fill="#fff"
-        stroke="#000"
-        strokeWidth="2"
-      />
-
-      {/* subtitle */}
-      <rect
-        x="68"
-        y="92"
-        width="56"
-        height="6"
-        fill="#FF4D6D"
-        stroke="#000"
-        strokeWidth="2"
-      />
-
-      {/* skill tags */}
-      <rect
-        x="16"
-        y="108"
-        width="30"
-        height="12"
-        fill="#fff"
-        stroke="#000"
-        strokeWidth="2"
-      />
-      <rect
-        x="50"
-        y="108"
-        width="40"
-        height="12"
-        fill="#00E5FF"
-        stroke="#000"
-        strokeWidth="2"
-      />
-      <rect
-        x="94"
-        y="108"
-        width="28"
-        height="12"
-        fill="#fff"
-        stroke="#000"
-        strokeWidth="2"
-      />
-      <rect
-        x="126"
-        y="108"
-        width="46"
-        height="12"
-        fill="#FF4D6D"
-        stroke="#000"
-        strokeWidth="2"
-      />
-
-      <text x="31" y="116" textAnchor="middle" fill="#000" fontSize="5" fontWeight="700">
-        React
-      </text>
-      <text x="70" y="116" textAnchor="middle" fill="#000" fontSize="5" fontWeight="700">
-        TS
-      </text>
-      <text x="108" y="116" textAnchor="middle" fill="#000" fontSize="5" fontWeight="700">
-        Next
-      </text>
-      <text x="149" y="116" textAnchor="middle" fill="#000" fontSize="5" fontWeight="700">
-        Tailwind
-      </text>
-    </svg>
-  );
-}
-
-function ClaymorphismPreview() {
-  return (
-    <svg
-      viewBox="0 0 200 130"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-    >
-      {/* background */}
-      <rect width="200" height="130" fill="#F6F7FB" />
-
-      <defs>
-        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="2" dy="3" stdDeviation="3" floodOpacity="0.15" />
-        </filter>
-      </defs>
-
-      {/* nav */}
-      <g filter="url(#shadow)">
-        <rect x="16" y="10" width="168" height="16" rx="8" fill="#FFFFFF" />
-      </g>
-
-      <rect x="24" y="15" width="24" height="4" rx="2" fill="#8B5CF6" />
-
-      <g filter="url(#shadow)">
-        <rect x="154" y="12" width="22" height="10" rx="5" fill="#DBEAFE" />
-      </g>
-
-      {/* avatar */}
-      <g filter="url(#shadow)">
-        <circle cx="100" cy="52" r="24" fill="#DBEAFE" />
-      </g>
-
-      <text
-        x="100"
-        y="57"
-        textAnchor="middle"
-        fill="#4C1D95"
-        fontSize="11"
-        fontWeight="bold"
-      >
-        AB
-      </text>
-
-      {/* title */}
-      <g filter="url(#shadow)">
-        <rect x="55" y="82" width="90" height="8" rx="4" fill="#FFFFFF" />
-      </g>
-
-      {/* subtitle */}
-      <g filter="url(#shadow)">
-        <rect x="70" y="95" width="60" height="6" rx="3" fill="#E9D5FF" />
-      </g>
-
-      {/* skill pills */}
-      <g filter="url(#shadow)">
-        <rect x="16" y="110" width="30" height="10" rx="5" fill="#FFFFFF" />
-        <rect x="50" y="110" width="40" height="10" rx="5" fill="#DBEAFE" />
-        <rect x="94" y="110" width="28" height="10" rx="5" fill="#FFFFFF" />
-        <rect x="126" y="110" width="48" height="10" rx="5" fill="#E9D5FF" />
-      </g>
-
-      <text x="31" y="117" textAnchor="middle" fill="#555" fontSize="5">
-        React
-      </text>
-      <text x="70" y="117" textAnchor="middle" fill="#555" fontSize="5">
-        TS
-      </text>
-      <text x="108" y="117" textAnchor="middle" fill="#555" fontSize="5">
-        Next
-      </text>
-      <text x="150" y="117" textAnchor="middle" fill="#555" fontSize="5">
-        Tailwind
-      </text>
-    </svg>
-  );
-}
-
-
-function SwissStylePreview() {
-  return (
-    <svg
-      viewBox="0 0 200 130"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-    >
-      {/* Background */}
-      <rect width="200" height="130" fill="#FFFFFF" />
-
-      {/* Swiss accent bar */}
-      <rect x="16" y="0" width="6" height="130" fill="#E11D48" />
-
-      {/* Grid lines */}
-      <rect x="40" y="0" width="0.5" height="130" fill="#E5E7EB" />
-      <rect x="120" y="0" width="0.5" height="130" fill="#E5E7EB" />
-
-      {/* Header */}
-      <rect x="50" y="16" width="70" height="7" fill="#111111" />
-      <rect x="50" y="28" width="90" height="3" fill="#9CA3AF" />
-
-      {/* Editorial image block */}
-      <rect x="50" y="42" width="55" height="55" fill="#F3F4F6" />
-      <text
-        x="77.5"
-        y="72"
-        textAnchor="middle"
-        fill="#6B7280"
-        fontSize="10"
-        fontWeight="700"
-      >
-        IMAGE
-      </text>
-
-      {/* Text column */}
-      <rect x="115" y="42" width="45" height="4" fill="#111111" />
-      <rect x="115" y="50" width="35" height="2" fill="#9CA3AF" />
-      <rect x="115" y="56" width="40" height="2" fill="#9CA3AF" />
-      <rect x="115" y="62" width="30" height="2" fill="#9CA3AF" />
-
-      <rect x="115" y="74" width="38" height="4" fill="#111111" />
-      <rect x="115" y="82" width="42" height="2" fill="#9CA3AF" />
-      <rect x="115" y="88" width="28" height="2" fill="#9CA3AF" />
-
-      {/* Footer tags */}
-      <rect x="50" y="108" width="24" height="8" fill="#111111" />
-      <rect x="80" y="108" width="30" height="8" fill="#E5E7EB" />
-      <rect x="116" y="108" width="38" height="8" fill="#E5E7EB" />
-
-      <text x="62" y="114" textAnchor="middle" fill="#FFF" fontSize="4.5">
-        UI
-      </text>
-      <text x="95" y="114" textAnchor="middle" fill="#555" fontSize="4.5">
-        Type
-      </text>
-      <text x="135" y="114" textAnchor="middle" fill="#555" fontSize="4.5">
-        Grid
-      </text>
-    </svg>
-  );
-}
-
-// ─── Template Registry (client-side metadata only) ────────────────────────────
-
-const TEMPLATES: TemplateDefinition[] = [
-  {
-    id: "original",
-    name: "Original",
-    description: "Dark, editorial dashboard layout with stat cards and glassmorphism accents.",
-    tag: "Dark · Grid",
-    palette: ["#0a0a0a", "#ffffff", "#1a1a1a"],
-    preview: OriginalPreview,
-  },
-  {
-    id: "minimal",
-    name: "Minimal",
-    description: "Clean white canvas, centered hero, and generous whitespace — lets the work speak.",
-    tag: "Light · Centered",
-    palette: ["#fafafa", "#111111", "#f0f0f0"],
-    preview: MinimalPreview,
-  },
-  {
-  id: "neobrutalism",
-  name: "Neo Brutalism",
-  description: "Bold colors, thick borders, hard shadows, and playful geometry that demand attention.",
-  tag: "Bold · Playful",
-  palette: ["#ffde59", "#111111", "#ff5c8a"],
-  preview: NeoBrutalismPreview,
-},
-{
-  id: "claymorphism",
-  name: "Claymorphism",
-  description: "Soft, pillowy surfaces with gentle shadows, rounded shapes, and a playful tactile feel.",
-  tag: "Soft · Tactile",
-  palette: ["#f6f7fb", "#8b5cf6", "#dbeafe"],
-  preview: ClaymorphismPreview,
-},
-{
-  id: "swissstyle",
-  name: "Swiss Style",
-  description: "Grid-driven layouts, bold typography, precise alignment, and timeless editorial clarity.",
-  tag: "Editorial · Grid",
-  palette: ["#ffffff", "#111111", "#e11d48"],
-  preview: SwissStylePreview,
-},
-];
+const PREVIEW_MAP: Record<string, React.FC> = {
+  original: OriginalPreview,
+};
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -495,187 +161,192 @@ function SectionBlock({
   );
 }
 
-// ─── Template Picker Modal ────────────────────────────────────────────────────
+// ─── Template Card ────────────────────────────────────────────────────────────
 
-function TemplatePickerModal({
-  currentTemplate,
+function TemplateCard({
+  template,
+  isActive,
   onSelect,
-  onClose,
+  onPreview,
+  onPurchase,
+  isPurchasing,
 }: {
-  currentTemplate: string;
-  onSelect: (id: string) => void;
-  onClose: () => void;
+  template: ApiTemplate;
+  isActive: boolean;
+  onSelect: (slug: string) => void;
+  onPreview: (slug: string) => void;
+  onPurchase: (slug: string) => void;
+  isPurchasing: boolean;
 }) {
-  const [hovered, setHovered] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [selected, setSelected] = useState(currentTemplate);
+  const [imgError, setImgError] = useState(false);
+  const [selecting, setSelecting] = useState(false);
+  const FallbackPreview = PREVIEW_MAP[template.slug];
+  const isLocked = !template.isFree && !template.isAccessible;
 
-  const handleConfirm = async () => {
-    if (selected === currentTemplate) { onClose(); return; }
-    setSaving(true);
-    await onSelect(selected);
-    setSaving(false);
+  const handleSelect = async () => {
+    if (isActive) return;
+    setSelecting(true);
+    await onSelect(template.slug);
+    setSelecting(false);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fadeIn"
-        onClick={onClose}
-      />
-
-      {/* Sheet */}
-      <div className="relative bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-scaleIn">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-900">
-          <div>
-            <h2 className="text-base font-bold text-black dark:text-white">Choose a Template</h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Pick a design — you can switch anytime without losing content.
-            </p>
+    <div
+      className={`group relative flex flex-col rounded-2xl border-2 overflow-hidden bg-white dark:bg-black transition-all duration-200 ${
+        isActive
+          ? "border-black dark:border-white shadow-lg"
+          : "border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-md"
+      }`}
+    >
+      {/* ── Thumbnail ── */}
+      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-950 flex-shrink-0">
+        {!imgError ? (
+          <img
+            src={template.thumbnail}
+            alt={template.name}
+            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+            onError={() => setImgError(true)}
+          />
+        ) : FallbackPreview ? (
+          <FallbackPreview />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-gray-600">
+            <ImageOff className="w-6 h-6" />
+            <span className="text-xs">No preview</span>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-xl text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors text-lg leading-none cursor-pointer"
-          >
-            ×
-          </button>
+        )}
+
+        {/* Active badge */}
+        {isActive && (
+          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold shadow-lg">
+            <CheckCircle2 className="w-3 h-3" />
+            Active
+          </div>
+        )}
+
+        {/* Pricing badge */}
+        <div
+          className={`absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-lg ${
+            template.isFree
+              ? "bg-emerald-500 text-white"
+              : "bg-gradient-to-r from-amber-400 to-orange-500 text-white"
+          }`}
+        >
+          {template.isFree ? (
+            <>
+              <Check className="w-3 h-3" />
+              Free
+            </>
+          ) : (
+            <>
+              <Crown className="w-3 h-3" />
+              ${template.price}
+            </>
+          )}
         </div>
 
-        {/* Template grid */}
-        <div className="p-6 grid sm:grid-cols-3 gap-4">
-  {TEMPLATES.map((tmpl) => {
-    const isSelected = selected === tmpl.id;
-    const Preview = tmpl.preview;
-
-    return (
-      <div
-        key={tmpl.id}
-        onMouseEnter={() => setHovered(tmpl.id)}
-        onMouseLeave={() => setHovered(null)}
-        className={`group relative rounded-2xl border-2 overflow-hidden transition-all duration-200 ${
-          isSelected
-            ? "border-black dark:border-white shadow-md"
-            : "border-gray-200 dark:border-gray-800 hover:border-gray-400 dark:hover:border-gray-600"
-        }`}
-      >
-        {/* Preview area */}
-        <div className="relative h-36 overflow-hidden bg-gray-100 dark:bg-gray-950">
-          <Preview />
-
-          {/* Hover overlay */}
-          <div
-            className={`absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity duration-200 ${
-              hovered === tmpl.id && !isSelected
-                ? "opacity-100"
-                : "opacity-0"
-            }`}
+        {/* Hover overlay with preview CTA */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+          <button
+            onClick={() => onPreview(template.slug)}
+            className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-semibold shadow-xl"
           >
-            <span className="px-4 py-1.5 rounded-full bg-white text-black text-xs font-semibold shadow">
-              {isSelected ? "Selected" : "Preview Available"}
-            </span>
-          </div>
+            <Eye className="w-3.5 h-3.5" />
+            Live Preview
+          </button>
+        </div>
+      </div>
 
-          {/* Selected badge */}
-          {isSelected && (
-            <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold shadow">
-              <CheckCircle2 className="w-3 h-3" />
-              Active
+      {/* ── Info ── */}
+      <div className="flex flex-col flex-1 p-4 gap-3">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-bold text-black dark:text-white leading-tight">
+              {template.name}
+            </h3>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 font-mono">
+              /{template.slug}
+            </p>
+          </div>
+          {!template.isFree && (
+            <div className="flex-shrink-0 flex items-center gap-1 text-amber-500">
+              <Star className="w-3.5 h-3.5 fill-amber-400 stroke-amber-400" />
+              <span className="text-xs font-bold">${template.price}</span>
             </div>
           )}
         </div>
 
-        {/* Info */}
-        <div className="px-4 py-3 bg-white dark:bg-black border-t border-gray-100 dark:border-gray-900">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-sm font-semibold text-black dark:text-white">
-              {tmpl.name}
-            </span>
+        {/* Action buttons */}
+        <div className="flex gap-2 mt-auto pt-1">
+          <button
+            onClick={() => onPreview(template.slug)}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 text-xs font-medium text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white transition-all duration-150"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Preview
+          </button>
 
-            <span className="text-[10px] font-medium text-gray-400 bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded-full">
-              {tmpl.tag}
-            </span>
-          </div>
-
-          <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-            {tmpl.description}
-          </p>
-
-          {/* Actions */}
-          <div className="flex gap-2 mt-3">
+          {template.isFree || template.isAccessible ? (
             <button
-              type="button"
-              onClick={() =>
-                window.open(`/preview/${tmpl.id}`, "_blank")
-              }
-              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
+              onClick={handleSelect}
+              disabled={isActive || selecting}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 ${
+                isActive
+                  ? "bg-black dark:bg-white text-white dark:text-black cursor-default"
+                  : "bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black"
+              } disabled:opacity-60 disabled:cursor-not-allowed`}
             >
-              Preview
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSelected(tmpl.id)}
-              className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
-                isSelected
-                  ? "bg-black text-white dark:bg-white dark:text-black"
-                  : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
-              }`}
-            >
-              {isSelected ? "Selected" : "Select"}
-            </button>
-          </div>
-
-          {/* Palette */}
-          <div className="flex items-center gap-1.5 mt-3">
-            {tmpl.palette.map((hex) => (
-              <span
-                key={hex}
-                className="w-4 h-4 rounded-full border border-gray-200 dark:border-gray-700"
-                style={{ backgroundColor: hex }}
-                title={hex}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  })}
-</div>
-
-        {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-900 flex items-center justify-between gap-3 bg-gray-50 dark:bg-[#0a0a0a]">
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            More templates coming soon.
-          </p>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirm}
-              disabled={saving}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer active:scale-[0.98]"
-            >
-              {saving ? (
-                <>
-                  <span className="w-3.5 h-3.5 border-2 border-white/40 dark:border-black/40 border-t-white dark:border-t-black rounded-full animate-spin" />
-                  Applying…
-                </>
-              ) : (
+              {selecting ? (
+                <span className="w-3.5 h-3.5 border-2 border-current/40 border-t-current rounded-full animate-spin" />
+              ) : isActive ? (
                 <>
                   <Check className="w-3.5 h-3.5" />
-                  Apply Template
+                  Applied
+                </>
+              ) : (
+                template.isFree ? "Use this" : "Use this"
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={() => onPurchase(template.slug)}
+              disabled={isPurchasing}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold hover:from-amber-500 hover:to-orange-600 transition-all duration-150 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isPurchasing ? (
+                <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <ShoppingCart className="w-3.5 h-3.5" />
+                  Buy · ${template.price}
                 </>
               )}
             </button>
-          </div>
+          )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── Template Section Skeleton ────────────────────────────────────────────────
+
+function TemplateSkeleton() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="rounded-2xl border-2 border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-black">
+          <div className="h-44 bg-gray-100 dark:bg-gray-900" />
+          <div className="p-4 space-y-3">
+            <div className="h-4 w-24 rounded bg-gray-100 dark:bg-gray-800" />
+            <div className="h-3 w-16 rounded bg-gray-100 dark:bg-gray-800" />
+            <div className="flex gap-2 pt-1">
+              <div className="flex-1 h-9 rounded-xl bg-gray-100 dark:bg-gray-800" />
+              <div className="flex-1 h-9 rounded-xl bg-gray-100 dark:bg-gray-800" />
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -701,9 +372,11 @@ export function PortfolioDashboard({
   const [copied, setCopied] = useState(false);
 
   // Template state
-  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [templates, setTemplates] = useState<ApiTemplate[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(true);
   const [activeTemplate, setActiveTemplate] = useState(data.selectedTemplate || "original");
   const [templateSaveToast, setTemplateSaveToast] = useState(false);
+  const [purchasingSlug, setPurchasingSlug] = useState<string | null>(null);
 
   useEffect(() => {
     const t1 = setTimeout(() => setHeaderVisible(true), 50);
@@ -711,27 +384,143 @@ export function PortfolioDashboard({
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
+  // ── Fetch templates ──
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const res = await fetch("/api/v2/all-templates");
+        if (!res.ok) throw new Error("Failed");
+        const json = await res.json();
+        const list: ApiTemplate[] = Array.isArray(json) ? json : json.data ?? [];
+        setTemplates(list.filter((t) => t.isActive));
+      } catch (err) {
+        console.error("Templates fetch failed:", err);
+      } finally {
+        setTemplatesLoading(false);
+      }
+    };
+    fetchTemplates();
+  }, []);
+
   const initials = data.name
     ? data.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
     : "?";
 
-  const currentTemplateMeta = TEMPLATES.find((t) => t.id === activeTemplate) ?? TEMPLATES[0];
+  const activeTemplateMeta = templates.find((t) => t.slug === activeTemplate);
 
   // ── Template select handler ──
-  const handleTemplateSelect = async (templateId: string) => {
+  const handleTemplateSelect = async (slug: string) => {
     try {
       const res = await fetch("/api/v1/user/portfolio/template", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ template: templateId }),
+        body: JSON.stringify({ template: slug }),
       });
-      if (!res.ok) throw new Error("Failed");
-      setActiveTemplate(templateId);
-      setShowTemplatePicker(false);
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || "Failed");
+      setActiveTemplate(slug);
+      setTemplates((prev) =>
+        prev.map((template) =>
+          template.slug === slug ? { ...template, isAccessible: true, isPurchased: true } : template
+        )
+      );
       setTemplateSaveToast(true);
       setTimeout(() => setTemplateSaveToast(false), 3000);
     } catch {
       alert("Failed to update template. Please try again.");
+    }
+  };
+
+  const handlePurchaseTemplate = async (slug: string) => {
+    const selectedTemplate = templates.find((template) => template.slug === slug);
+    if (!selectedTemplate) return;
+
+    setPurchasingSlug(slug);
+
+    try {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = async () => {
+        try {
+          const res = await fetch("/api/v1/user/portfolio/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ templateSlug: slug }),
+          });
+          const data = await res.json();
+          console.log(data.order);
+
+          if (!res.ok || !data.success || !data.order?.id) {
+            throw new Error(data.message || "Checkout failed");
+          }
+          console.log(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
+          const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
+            amount: data.order.amount,
+            currency: data.order.currency,
+            order_id: data.order.id,
+            name: "Profilix",
+            description: `Unlock ${selectedTemplate.name}`,
+            prefill: {
+              email: data.userEmail || "",
+            },
+            handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+              try {
+                const verifyRes = await fetch("/api/v1/user/portfolio/verify", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(response),
+                });
+                const verifyData = await verifyRes.json();
+                if (!verifyRes.ok || !verifyData.success) {
+                  throw new Error(verifyData.message || "Payment verification failed");
+                }
+                setTemplates((prev) =>
+                  prev.map((template) =>
+                    template.slug === slug ? { ...template, isAccessible: true, isPurchased: true } : template
+                  )
+                );
+                setActiveTemplate(slug);
+                setTemplateSaveToast(true);
+                setTimeout(() => setTemplateSaveToast(false), 3000);
+                router.push(`/payment/success?slug=${slug}`);
+              } catch {
+                alert("Payment succeeded but access could not be unlocked. Please contact support.");
+              }
+            },
+            modal: {
+              ondismiss: () => {
+                router.push("/payment/failed");
+              },
+            },
+            theme: { color: "#000000" },
+          };
+
+          const RazorpayCtor = (window as Window & { Razorpay?: any }).Razorpay;
+          if (!RazorpayCtor) {
+            throw new Error("Razorpay checkout is unavailable in this browser");
+          }
+          const rzp = new RazorpayCtor(options);
+          rzp.on("payment.failed", function (response: any) {
+  console.log("Payment Failed:", response.error);
+  alert(JSON.stringify(response.error, null, 2));
+});
+          rzp.open();
+        } catch (error) {
+          alert(error instanceof Error ? error.message : "Checkout failed");
+        } finally {
+          setPurchasingSlug(null);
+        }
+      };
+      script.onerror = () => {
+        alert("Unable to load Razorpay checkout. Please try again.");
+        setPurchasingSlug(null);
+      };
+      document.body.appendChild(script);
+    } catch {
+      alert("Unable to start payment checkout.");
+      setPurchasingSlug(null);
     }
   };
 
@@ -800,7 +589,6 @@ export function PortfolioDashboard({
         >
           <div className="h-0.5 w-full bg-emerald-500" />
           <div className="p-6 flex flex-col sm:flex-row sm:items-center gap-5">
-            {/* Identity */}
             <div className="flex items-center gap-4 flex-1 min-w-0">
               <div className="relative flex-shrink-0 w-12 h-12 rounded-xl bg-black dark:bg-white flex items-center justify-center text-white dark:text-black text-base font-bold">
                 {initials}
@@ -822,7 +610,6 @@ export function PortfolioDashboard({
               </div>
             </div>
 
-            {/* CTAs */}
             <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
               <button
                 onClick={onPreview}
@@ -847,119 +634,78 @@ export function PortfolioDashboard({
           <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-900 bg-gray-50 dark:bg-[#0a0a0a] flex items-center gap-2">
             <Layers className="w-3 h-3 text-gray-400 dark:text-gray-300 flex-shrink-0" />
             <p className="text-xs text-gray-500 dark:text-gray-300">
-              Your portfolio is ready — publish now to get a live URL, or edit any section first.
+              {activeTemplateMeta
+                ? <>Using <span className="font-semibold text-black dark:text-white">{activeTemplateMeta.name}</span> template — publish now to go live, or pick a different design below.</>
+                : "Your portfolio is ready — publish now to get a live URL, or edit any section first."
+              }
             </p>
-          </div>
-        </div>
-
-        {/* ── Template Selector Card ── */}
-        <div
-          className={`rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black overflow-hidden transition-all duration-500 ${
-            bannerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-          }`}
-          style={{ transitionDelay: "100ms" }}
-        >
-          {/* Card header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-900">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-                <Layout className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-              </div>
-              <div>
-                <h2 className="text-sm font-semibold text-black dark:text-white">Portfolio Template</h2>
-                <p className="text-xs text-gray-400 dark:text-gray-600">Design applied to your public page</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowTemplatePicker(true)}
-              className="group inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white transition-all duration-200 cursor-pointer"
-            >
-              <Sparkles className="w-3 h-3 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
-              Change template
-            </button>
-          </div>
-
-          {/* Active template display */}
-          <div className="p-6">
-            <div className="flex items-start gap-5">
-              {/* Thumbnail */}
-              <div className="relative flex-shrink-0 w-40 h-26 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm">
-                <div className="w-40 h-26">
-                  <currentTemplateMeta.preview />
-                </div>
-                {/* live badge */}
-                <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-[9px] font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                  Current
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0 pt-1">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-base font-bold text-black dark:text-white">
-                    {currentTemplateMeta.name}
-                  </span>
-                  <span className="text-[10px] font-medium text-gray-400 bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded-full">
-                    {currentTemplateMeta.tag}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-3">
-                  {currentTemplateMeta.description}
-                </p>
-                {/* Palette row */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400 dark:text-gray-600">Palette</span>
-                  <div className="flex items-center gap-1.5">
-                    {currentTemplateMeta.palette.map((hex) => (
-                      <span
-                        key={hex}
-                        className="w-4 h-4 rounded-full border border-gray-200 dark:border-gray-700"
-                        style={{ backgroundColor: hex }}
-                        title={hex}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Template list — quick switcher (desktop) */}
-              <div className="hidden lg:flex flex-col gap-1.5 flex-shrink-0">
-                {TEMPLATES.map((tmpl) => (
-                  <button
-                    key={tmpl.id}
-                    onClick={() =>
-                      tmpl.id !== activeTemplate
-                        ? handleTemplateSelect(tmpl.id)
-                        : undefined
-                    }
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 cursor-pointer ${
-                      tmpl.id === activeTemplate
-                        ? "bg-black dark:bg-white text-white dark:text-black"
-                        : "bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white"
-                    }`}
-                  >
-                    <span
-                      className="w-2.5 h-2.5 rounded-full border border-gray-300 dark:border-gray-600"
-                      style={{ backgroundColor: tmpl.palette[0] }}
-                    />
-                    {tmpl.name}
-                    {tmpl.id === activeTemplate && (
-                      <Check className="w-3 h-3 ml-auto" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
         {/* ── Stats ── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <StatCard icon={Code2} label="Skills" value={data.skills?.length ?? 0} delay={100} />
-          <StatCard icon={Briefcase} label="Experience" value={data.experience?.length ?? 0} delay={150} />
-          <StatCard icon={GraduationCap} label="Education" value={data.education?.length ?? 0} delay={200} />
-          <StatCard icon={User} label="Projects" value={data.projects?.length ?? 0} delay={250} />
+          <StatCard icon={Code2}         label="Skills"     value={data.skills?.length ?? 0}     delay={100} />
+          <StatCard icon={Briefcase}     label="Experience" value={data.experience?.length ?? 0}  delay={150} />
+          <StatCard icon={GraduationCap} label="Education"  value={data.education?.length ?? 0}   delay={200} />
+          <StatCard icon={User}          label="Projects"   value={data.projects?.length ?? 0}    delay={250} />
+        </div>
+
+        {/* ── Templates section ── */}
+        <div
+          className={`space-y-4 transition-all duration-500 ${
+            bannerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+          }`}
+          style={{ transitionDelay: "150ms" }}
+        >
+          {/* Section header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-white dark:bg-black border border-gray-200 dark:border-gray-800 flex items-center justify-center shadow-sm">
+                <Layout className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-black dark:text-white">Choose a Template</h2>
+                <p className="text-xs text-gray-400 dark:text-gray-600">
+                  {templatesLoading
+                    ? "Loading templates…"
+                    : `${templates.length} template${templates.length !== 1 ? "s" : ""} available · ${templates.filter(t => t.isFree).length} free`}
+                </p>
+              </div>
+            </div>
+            {!templatesLoading && templates.some(t => !t.isFree) && (
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200 dark:border-amber-800">
+                <Crown className="w-3 h-3 text-amber-500" />
+                <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                  Premium templates available
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Template grid */}
+          {templatesLoading ? (
+            <TemplateSkeleton />
+          ) : templates.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 text-gray-400 dark:text-gray-600">
+              <Layout className="w-8 h-8 mb-3" />
+              <p className="text-sm font-medium">No templates available</p>
+              <p className="text-xs mt-1">Check back soon — more are on the way.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {templates.map((tmpl) => (
+                <TemplateCard
+                  key={tmpl._id}
+                  template={tmpl}
+                  isActive={activeTemplate === tmpl.slug}
+                  onSelect={handleTemplateSelect}
+                  onPreview={(slug) => window.open(`/preview/${slug}`, "_blank")}
+                  onPurchase={handlePurchaseTemplate}
+                  isPurchasing={purchasingSlug === tmpl.slug}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Content grid ── */}
@@ -1092,7 +838,7 @@ export function PortfolioDashboard({
 
         {/* ── Footer ── */}
         <footer className="mt-10 text-sm text-gray-400">
-          <hr />
+          <hr className="border-gray-200 dark:border-gray-800" />
           <div className="flex flex-col md:flex-row justify-between items-center px-4 py-4">
             <div>
               <p className="font-medium text-gray-100">Profilix</p>
@@ -1110,18 +856,9 @@ export function PortfolioDashboard({
         </footer>
       </div>
 
-      {/* ── Template picker modal ── */}
-      {showTemplatePicker && (
-        <TemplatePickerModal
-          currentTemplate={activeTemplate}
-          onSelect={handleTemplateSelect}
-          onClose={() => setShowTemplatePicker(false)}
-        />
-      )}
-
       {/* ── Template saved toast ── */}
       <div
-        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-5 py-3 rounded-2xl bg-black dark:bg-white text-white dark:text-black text-sm font-medium shadow-xl transition-all duration-300 ${
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-5 py-3 rounded-2xl bg-black dark:bg-white text-white dark:text-black text-sm font-medium shadow-xl transition-all duration-300 whitespace-nowrap ${
           templateSaveToast ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none"
         }`}
       >

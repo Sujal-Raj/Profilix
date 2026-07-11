@@ -4,8 +4,8 @@ export default function HowItWorksPage() {
   const steps = [
     {
       number: "1",
-      title: "Upload Your Projects",
-      description: "Simply drag and drop your work or upload files directly from your device.",
+      title: "Upload Your Resume",
+      description: "Simply drag and drop your resume or upload files directly from your device.",
       icon: Upload,
       delay: "0ms"
     },
@@ -27,10 +27,10 @@ export default function HowItWorksPage() {
 
   return (
     <>
-      <section className="py-20 bg-white dark:bg-black relative overflow-hidden">
+      <section className="py-10 bg-white dark:bg-black relative overflow-hidden">
         {/* Subtle background gradient */}
-        {/* <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-transparent dark:from-gray-900/30 dark:to-transparent pointer-events-none" /> */}
-        <div className="absolute inset-0 bg-white dark:bg-black pointer-events-none" />
+        {/* <div className="absolute inset-0 bg-linear-to-b from-gray-500/40 to-transparent dark:from-gray-900/30 dark:to-transparent pointer-events-none" /> */}
+        {/* <div className="absolute inset-0 bg-white dark:bg-black pointer-events-none" /> */}
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-20">
@@ -52,7 +52,7 @@ export default function HowItWorksPage() {
           {/* Steps with connecting line */}
           <div className="relative">
             {/* Connecting line - hidden on mobile */}
-            <div className="hidden md:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent" 
+            <div className="hidden md:block absolute top-16 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent" 
                  style={{ top: '4rem' }} />
             
             <div className="grid md:grid-cols-3 gap-8 md:gap-12 relative">

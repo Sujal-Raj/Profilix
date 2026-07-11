@@ -91,7 +91,7 @@ export interface IPortfolio extends Document {
   }[];
 
   skills: string[];
-  selectedTemplate:string;
+  selectedTemplate: string;
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -153,9 +153,9 @@ const PortfolioSchema = new Schema<IPortfolio>(
 
     skills: [{ type: String, required: true }],
     selectedTemplate: {
-     type: String,
-     default: "original",
-   },
+      type: String,
+      default: "original",
+    },
   },
   { timestamps: true }
 );
