@@ -478,7 +478,9 @@ export function PortfolioDashboard({ data, onPreview }: { data: PortfolioData; o
               <div className="space-y-3">
                 {data.email && (
                   <a
-                    href={`mailto:${data.email}`}
+                    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${data.email}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors truncate"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600 flex-shrink-0" />

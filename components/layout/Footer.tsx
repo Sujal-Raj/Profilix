@@ -13,7 +13,7 @@ export default function Footer() {
     { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/sujalraj1/' },
     // { icon: Twitter, label: 'Twitter', href: '#' },
     // { icon: Instagram, label: 'Instagram', href: '#' },
-    { icon: Mail, label: 'Email', href: 'mailto:developersujal4@gmail.com' }
+    { icon: Mail, label: 'Email', href: 'https://mail.google.com/mail/?view=cm&fs=1&to=developersujal4@gmail.com' }
   ];
 
   const scrollToTop = () => {
@@ -58,6 +58,8 @@ export default function Footer() {
                 <a
                   key={index}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
                   onMouseEnter={() => setHoveredIcon(index)}
                   onMouseLeave={() => setHoveredIcon(null)}

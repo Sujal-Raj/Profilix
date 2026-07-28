@@ -151,7 +151,9 @@ export default function PortfolioPreview({
               </a>
             )}
             <a
-              href={`mailto:${portfolio.email}`}
+              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${portfolio.email || portfolio.userEmail}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className={`ml-2 px-4 sm:px-5 py-2 ${
                 isDark
                   ? "bg-white text-black"
@@ -190,7 +192,9 @@ export default function PortfolioPreview({
 
           <div className="flex flex-wrap gap-4 items-center animate-fade-in-up animation-delay-300">
             <a
-              href={`mailto:${portfolio.email}`}
+              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${portfolio.email || portfolio.userEmail}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className={`inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 ${
                 isDark ? "bg-white text-black" : "bg-gray-900 text-white"
               } rounded-lg font-medium text-sm sm:text-base hover:opacity-90 transition-all duration-300 group`}
@@ -389,7 +393,9 @@ export default function PortfolioPreview({
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a 
-                href={`mailto:${portfolio.email}`}
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${portfolio.email || portfolio.userEmail}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 ${
                   isDark ? "bg-black text-white" : "bg-white text-black"
                 } rounded-xl font-medium hover:scale-105 transition-all duration-300 hover:shadow-2xl ${
@@ -448,7 +454,9 @@ export default function PortfolioPreview({
                 </a>
               )}
               <a 
-                href={`mailto:${portfolio.email}`}
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${portfolio.email || portfolio.userEmail}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`transition-colors ${
                   isDark ? "hover:text-white" : "hover:text-gray-900"
                 }`}

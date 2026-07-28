@@ -323,7 +323,9 @@ export default function PortfolioPage() {
               </a>
             )}
             <a
-              href={`mailto:${portfolio?.email || portfolio?.userEmail}`}
+              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${portfolio?.email || portfolio?.userEmail}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="ml-2 px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium hover:opacity-90 transition-all duration-300"
             >
               Contact
@@ -356,7 +358,9 @@ export default function PortfolioPage() {
 
           <div className="flex flex-wrap gap-4 items-center animate-fade-in-up animation-delay-300">
             <a
-              href={`mailto:${portfolio?.email || portfolio?.userEmail}`}
+              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${portfolio?.email || portfolio?.userEmail}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-all duration-300 group"
             >
               <Mail className="w-4 h-4" />
@@ -515,7 +519,9 @@ export default function PortfolioPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a
-                href={`mailto:${portfolio?.email || portfolio?.userEmail}`}
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${portfolio?.email || portfolio?.userEmail}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-black text-black dark:text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-white/20 dark:hover:shadow-black/20 group"
               >
                 <Mail className="w-5 h-5" />
@@ -553,7 +559,7 @@ export default function PortfolioPage() {
                   LinkedIn
                 </a>
               )}
-              <a href={`mailto:${portfolio?.email || portfolio?.userEmail}`} className="hover:text-gray-900 dark:hover:text-white transition-colors">
+              <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${portfolio?.email || portfolio?.userEmail}`} target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 dark:hover:text-white transition-colors">
                 Email
               </a>
             </div>
